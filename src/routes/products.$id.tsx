@@ -254,7 +254,8 @@ function PdpPage() {
             <div className="space-y-6">
               
               {/* Exchange Widget (Flipkart Style) */}
-              <div className="space-y-3">
+              {(data.exchangeDiscount ?? 0) > 0 && (
+                <div className="space-y-3">
                 <h3 className="font-semibold text-lg">Exchange Offer</h3>
                 <RadioGroup value={exchange} onValueChange={(val: "yes" | "no") => setExchange(val)} className="grid gap-4 sm:grid-cols-2">
                   <Label
@@ -286,15 +287,16 @@ function PdpPage() {
                         <RadioGroupItem value="yes" id="exchange-yes" className="text-success border-success data-[state=checked]:border-success data-[state=checked]:text-success" />
                         <span className="font-medium text-base">With Exchange</span>
                       </div>
-                      <Badge className="bg-success text-success-foreground hover:bg-success">Save ₹1,000</Badge>
+                      <Badge className="bg-success text-success-foreground hover:bg-success">Save ₹{data.exchangeDiscount?.toLocaleString()}</Badge>
                     </div>
                     <span className="text-2xl font-bold text-success ml-6">
-                      ₹{Math.max(0, data.productPrice - 1000).toLocaleString()}
+                      ₹{Math.max(0, data.productPrice - (data.exchangeDiscount || 0)).toLocaleString()}
                     </span>
                     <span className="text-sm text-muted-foreground ml-6 mt-1">Return old battery</span>
                   </Label>
                 </RadioGroup>
               </div>
+              )}
 
               {/* Actions */}
               <div className="flex flex-col sm:flex-row items-center gap-4 pt-4">
@@ -369,8 +371,14 @@ function PdpPage() {
             {data.compatibleVehicles && data.compatibleVehicles.length > 0 ? (
               <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {data.compatibleVehicles.map((v) => (
-                  <li key={v.vehicleId} className="flex items-center gap-3 rounded-xl border bg-muted/30 p-4 hover:bg-muted/50 transition-colors">
-                    <Truck className="h-8 w-8 text-muted-foreground/50 shrink-0" />
+                  <li key={v.vehicleId} className="flex items-center gap-3 rounded-xl border bg-muted/30 p-3 hover:bg-muted/50 transition-colors">
+                    {v.imageUrl ? (
+                      <div className="h-10 w-10 shrink-0 rounded bg-white p-1">
+                        <img src={v.imageUrl} alt={v.model} className="h-full w-full object-contain" />
+                      </div>
+                    ) : (
+                      <Truck className="h-8 w-8 text-muted-foreground/50 shrink-0" />
+                    )}
                     <div>
                       <div className="font-semibold text-foreground">
                         {v.make} {v.model}

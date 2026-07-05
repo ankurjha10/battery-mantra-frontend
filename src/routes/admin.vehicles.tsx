@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/feedback/Spinner";
-import { Trash2, Plus, Edit } from "lucide-react";
+import { Trash2, Plus, Edit, Car } from "lucide-react";
 import { toast } from "sonner";
 import { FormField } from "@/components/forms/FormField";
 import {
@@ -43,6 +43,7 @@ const vehicleSchema = z.object({
   yearFrom: z.coerce.number().min(1900).optional().or(z.literal(0)),
   yearTo: z.coerce.number().min(1900).optional().or(z.literal(0)),
   fuelType: z.enum(["PETROL", "DIESEL", "ELECTRIC", "CNG"]).optional(),
+  imageUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
 });
 
 type VehicleFormValues = z.infer<typeof vehicleSchema>;
@@ -70,6 +71,7 @@ function AdminVehicles() {
       yearFrom: undefined,
       yearTo: undefined,
       fuelType: undefined,
+      imageUrl: "",
     });
     setIsModalOpen(true);
   };
@@ -82,6 +84,7 @@ function AdminVehicles() {
       yearFrom: vehicle.yearFrom,
       yearTo: vehicle.yearTo,
       fuelType: vehicle.fuelType,
+      imageUrl: vehicle.imageUrl || "",
     });
     setIsModalOpen(true);
   };
@@ -129,6 +132,7 @@ function AdminVehicles() {
       yearFrom: values.yearFrom ? values.yearFrom : undefined,
       yearTo: values.yearTo ? values.yearTo : undefined,
       fuelType: values.fuelType,
+      imageUrl: values.imageUrl || undefined,
     };
 
     if (editingVehicle) {
@@ -154,6 +158,7 @@ function AdminVehicles() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-[80px]">Image</TableHead>
               <TableHead>Make</TableHead>
               <TableHead>Model</TableHead>
               <TableHead>Years</TableHead>
@@ -177,6 +182,17 @@ function AdminVehicles() {
             ) : (
               vehicles.map((vehicle) => (
                 <TableRow key={vehicle.vehicleId}>
+                  <TableCell>
+                    {vehicle.imageUrl ? (
+                      <div className="h-10 w-10 rounded-md border bg-muted/30 overflow-hidden flex items-center justify-center">
+                        <img src={vehicle.imageUrl} alt={vehicle.make} className="w-full h-full object-contain p-1" />
+                      </div>
+                    ) : (
+                      <div className="h-10 w-10 rounded-md border bg-muted/30 flex items-center justify-center text-muted-foreground">
+                        <Car className="h-5 w-5" />
+                      </div>
+                    )}
+                  </TableCell>
                   <TableCell className="font-medium">{vehicle.make}</TableCell>
                   <TableCell>{vehicle.model}</TableCell>
                   <TableCell>
@@ -260,6 +276,10 @@ function AdminVehicles() {
                 <option value="CNG">CNG</option>
                 <option value="ELECTRIC">Electric</option>
               </select>
+            </FormField>
+
+            <FormField label="Image URL" htmlFor="imageUrl" error={form.formState.errors.imageUrl?.message}>
+              <Input id="imageUrl" type="url" {...form.register("imageUrl")} placeholder="https://example.com/car.png" />
             </FormField>
 
             <div className="flex justify-end gap-3 pt-4">

@@ -21,6 +21,7 @@ const formSchema = z.object({
   productName: z.string().min(2, "Name is required"),
   productDescription: z.string().optional(),
   productPrice: z.coerce.number().min(0, "Price must be positive"),
+  exchangeDiscount: z.coerce.number().min(0).optional().default(0),
   productStock: z.coerce.number().min(0).optional(),
   productImage: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   categoryId: z.string().uuid("Category is required"),
@@ -55,6 +56,7 @@ function AddProductPage() {
       productName: "",
       productDescription: "",
       productPrice: 0,
+      exchangeDiscount: 0,
       productStock: 0,
       productImage: "",
       compatibleVehicleIds: [],
@@ -91,6 +93,7 @@ function AddProductPage() {
       productName: data.productName,
       productDescription: data.productDescription || undefined,
       productPrice: data.productPrice,
+      exchangeDiscount: data.exchangeDiscount,
       productStock: data.productStock,
       productImage: data.productImage || undefined,
       categoryId: data.categoryId,
@@ -230,6 +233,11 @@ function AddProductPage() {
                 <Label htmlFor="productPrice">Price (₹) <span className="text-red-500">*</span></Label>
                 <Input id="productPrice" type="number" min="0" step="1" {...form.register("productPrice")} />
                 {form.formState.errors.productPrice && <p className="text-xs text-red-500">{form.formState.errors.productPrice.message}</p>}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="exchangeDiscount">Exchange Discount (₹)</Label>
+                <Input id="exchangeDiscount" type="number" min="0" step="1" {...form.register("exchangeDiscount")} />
+                <p className="text-xs text-muted-foreground">Set to 0 if exchange is not applicable for this battery.</p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="productStock">Stock Quantity</Label>

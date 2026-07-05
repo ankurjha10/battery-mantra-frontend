@@ -64,6 +64,7 @@ export function VehicleStepper({ value, onChange, compact }: Props) {
                 ]
                   .filter(Boolean)
                   .join(" · "),
+                imageUrl: v.imageUrl,
               }))}
               activeId={value.vehicleId}
               onSelect={(id) => onChange({ ...value, vehicleId: String(id) })}
@@ -116,7 +117,7 @@ function StepRow({
   );
 }
 
-type ChipItem = { id: string; label: string; meta?: string };
+type ChipItem = { id: string; label: string; meta?: string; imageUrl?: string | null };
 
 function Chips({
   items,
@@ -143,12 +144,17 @@ function Chips({
                 : "border-border bg-surface hover:border-primary/40 hover:bg-primary-soft",
             )}
           >
-            <span className="font-medium">{item.label}</span>
-            {item.meta ? (
-              <span className={cn("text-xs", active ? "opacity-90" : "text-muted-foreground")}>
-                {item.meta}
-              </span>
-            ) : null}
+            {item.imageUrl && (
+              <img src={item.imageUrl} alt={item.label} className="w-8 h-8 object-contain bg-white rounded flex-shrink-0" />
+            )}
+            <div className="flex flex-col items-start text-left">
+              <span className="font-medium leading-tight">{item.label}</span>
+              {item.meta ? (
+                <span className={cn("text-[10px]", active ? "opacity-90" : "text-muted-foreground")}>
+                  {item.meta}
+                </span>
+              ) : null}
+            </div>
           </button>
         );
       })}

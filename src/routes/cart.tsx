@@ -123,7 +123,7 @@ function CartPage() {
                         {it.exchangeOldBattery && (
                           <div className="mt-1">
                             <span className="text-[10px] font-semibold uppercase tracking-wide text-success bg-success/10 px-1.5 py-0.5 rounded-sm">
-                              Exchange old battery (-₹1,000)
+                              Exchange old battery (-₹{it.product.exchangeDiscount?.toLocaleString()})
                             </span>
                           </div>
                         )}

@@ -38,6 +38,7 @@ export type VehicleResponse = {
   yearFrom?: number;
   yearTo?: number;
   fuelType?: FuelType;
+  imageUrl?: string | null;
 };
 export type CreateVehicleRequest = {
   make: string;
@@ -45,6 +46,7 @@ export type CreateVehicleRequest = {
   yearFrom?: number;
   yearTo?: number;
   fuelType?: FuelType;
+  imageUrl?: string;
 };
 
 /* ---------- Brands ---------- */
@@ -89,6 +91,7 @@ export type ProductListResponse = {
   productName: string;
   brandName?: string;
   productPrice: number;
+  exchangeDiscount?: number;
   productImage?: string;
   productCategory?: string;
 };
@@ -102,6 +105,7 @@ export type ProductDetailResponse = {
   categoryName?: string;
   categoryId?: UUID;
   productPrice: number;
+  exchangeDiscount?: number;
   productStock?: number;
   productImage?: string;
   specs?: Record<string, unknown>;
@@ -213,6 +217,7 @@ export type CreateProductRequest = {
   productDescription?: string;
   productStock?: number;
   productPrice: number;
+  exchangeDiscount?: number;
   productImage?: string;
   categoryId?: UUID;
   brandId?: UUID;
