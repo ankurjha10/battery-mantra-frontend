@@ -5,10 +5,13 @@ export function buildSrcSet(src: string, widths: number[] = [320, 480, 640, 960,
   return widths.map((w) => `${appendQuery(src, { w })} ${w}w`).join(", ");
 }
 
+import { env, isBrowser } from "@/lib/utils/env";
+
 export function appendQuery(src: string, params: Record<string, string | number>): string {
   if (!src) return src;
   try {
-    const url = new URL(src, "http://localhost");
+    const dummyBase = isBrowser ? window.location.origin : (env.API_BASE_URL || "http://dummy");
+    const url = new URL(src, dummyBase);
     for (const [k, v] of Object.entries(params)) url.searchParams.set(k, String(v));
     return src.startsWith("http") ? url.toString() : `${url.pathname}${url.search}`;
   } catch {

@@ -13,6 +13,7 @@ import { authService } from "@/services/auth.service";
 import { ApiError } from "@/lib/api/errors";
 import { useAuth } from "@/providers/AuthProvider";
 import { toast } from "sonner";
+import { env } from "@/lib/utils/env";
 
 const schema = z.object({
   username: z.string().trim().min(1, "Username, email, or phone is required"),
@@ -55,7 +56,8 @@ function LoginPage() {
       // we probe an admin endpoint to check if the user is an ADMIN.
       let role = "CUSTOMER";
       try {
-        const probeRes = await fetch("http://localhost:8080/api/admin/users", {
+        const baseUrl = env.API_BASE_URL.replace(/\/$/, "");
+        const probeRes = await fetch(`${baseUrl}/api/admin/users`, {
           method: "GET",
           headers: { Authorization: `Bearer ${res.token}` },
         });
