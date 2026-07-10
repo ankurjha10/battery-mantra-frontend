@@ -23,21 +23,13 @@ function AdminDashboard() {
 
   const isLoading = usersQuery.isLoading || ordersQuery.isLoading;
 
-  if (isLoading) {
-    return (
-      <div className="flex h-64 items-center justify-center">
-        <Spinner size="lg" />
-      </div>
-    );
-  }
-
   const usersCount = usersQuery.data?.length || 0;
   const orders = ordersQuery.data || [];
   const ordersCount = orders.length;
   const pendingOrders = orders.filter(o => o.orderStatus === "PENDING").length;
   
   // Logic: Do not count cancelled/returned orders.
-  // For COD (currently all online orders), only count profit when DELIVERED or INSTALLED.
+  // For COD, only count profit when DELIVERED or INSTALLED.
   const validRevenueOrders = orders.filter(o => 
     o.orderStatus === "DELIVERED" || o.orderStatus === "INSTALLED"
   );
@@ -73,7 +65,10 @@ function AdminDashboard() {
   }, [orders]);
 
   // Sort orders descending by date
-  const recentOrders = [...orders].sort((a, b) => new Date(b.placedAt).getTime() - new Date(a.placedAt).getTime()).slice(0, 5);
+  const recentOrders = useMemo(() => 
+    [...orders].sort((a, b) => new Date(b.placedAt).getTime() - new Date(a.placedAt).getTime()).slice(0, 5),
+    [orders]
+  );
 
   const getStatusColor = (status: string) => {
     switch(status) {
@@ -93,6 +88,14 @@ function AdminDashboard() {
   const formatTime = (dateString: string) => {
     return new Date(dateString).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
