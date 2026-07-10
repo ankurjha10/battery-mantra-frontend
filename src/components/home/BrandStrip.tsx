@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { featuredBrandsQuery, brandsQuery } from "@/queries";
 import { SkeletonBlock } from "@/components/feedback/SkeletonPresets";
 import { Image } from "@/components/common/Image";
-import { useRef, useEffect, useState, useCallback } from "react";
+import { ArrowRight } from "lucide-react";
 
 export function BrandStrip() {
   const featured = useQuery(featuredBrandsQuery());
@@ -15,101 +15,54 @@ export function BrandStrip() {
 
   if (isLoading) {
     return (
-      <div className="flex gap-3 overflow-x-auto">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
         {Array.from({ length: 6 }).map((_, i) => (
-          <SkeletonBlock key={i} className="h-20 w-32 shrink-0" />
+          <SkeletonBlock key={i} className="h-28 rounded-2xl" />
         ))}
       </div>
     );
   }
   if (data.length === 0) return null;
 
-  return <InfiniteMarquee brands={data} />;
-}
-
-type Brand = { brandId: string; brandName: string; brandLogo?: string | null };
-
-function InfiniteMarquee({ brands }: { brands: Brand[] }) {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const [isPaused, setIsPaused] = useState(false);
-  const offsetRef = useRef(0);
-  const rafRef = useRef<number>(0);
-  const lastTimeRef = useRef<number>(0);
-  const speedPx = 40; // pixels per second
-
-  const animate = useCallback(
-    (time: number) => {
-      if (!trackRef.current) return;
-      if (lastTimeRef.current === 0) lastTimeRef.current = time;
-      const delta = (time - lastTimeRef.current) / 1000;
-      lastTimeRef.current = time;
-
-      if (!isPaused) {
-        offsetRef.current -= speedPx * delta;
-
-        // Get the width of one set of items (half the track since we duplicate)
-        const halfWidth = trackRef.current.scrollWidth / 2;
-        if (Math.abs(offsetRef.current) >= halfWidth) {
-          offsetRef.current += halfWidth;
-        }
-
-        trackRef.current.style.transform = `translateX(${offsetRef.current}px)`;
-      }
-
-      rafRef.current = requestAnimationFrame(animate);
-    },
-    [isPaused]
-  );
-
-  useEffect(() => {
-    rafRef.current = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(rafRef.current);
-  }, [animate]);
-
-  // Reset lastTime when pausing/unpausing to prevent jumps
-  useEffect(() => {
-    lastTimeRef.current = 0;
-  }, [isPaused]);
-
   return (
-    <div
-      className="relative flex w-full overflow-hidden py-2"
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
-    >
-      {/* Edge Gradients for Premium Look */}
-      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-background to-transparent sm:w-24" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-background to-transparent sm:w-24" />
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+      {data.map((b) => (
+        <Link
+          key={b.brandId}
+          to="/products"
+          search={{ brandId: b.brandId }}
+          className="group relative flex flex-col items-center justify-center gap-2.5 rounded-2xl border border-border/80 bg-card p-5 transition-all duration-200 hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
+        >
+          {/* Subtle glow on hover */}
+          <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/5 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
 
-      <div
-        ref={trackRef}
-        className="flex w-max gap-4 px-2 sm:gap-6 sm:px-3"
-        style={{ willChange: "transform" }}
-      >
-        {/* Render brands twice for seamless loop */}
-        {[...brands, ...brands].map((b, i) => (
-          <Link
-            key={`${b.brandId}-${i}`}
-            to="/products"
-            search={{ brandId: b.brandId }}
-            className="group flex h-20 w-32 shrink-0 flex-col items-center justify-center gap-1 rounded-xl border border-border bg-card px-3 transition-all hover:-translate-y-1 hover:border-primary/40 hover:shadow-product sm:h-24 sm:w-40"
-          >
+          <div className="relative flex h-12 w-full items-center justify-center sm:h-14">
             {b.brandLogo ? (
               <Image
                 src={b.brandLogo}
                 alt={b.brandName}
                 aspect="auto"
                 rounded={false}
-                className="h-10 w-full bg-transparent sm:h-12"
+                className="h-full w-full bg-transparent object-contain"
               />
             ) : (
-              <span className="font-display text-sm font-semibold text-foreground transition-colors group-hover:text-primary sm:text-base">
+              <span className="font-display text-lg font-bold tracking-tight text-foreground transition-colors group-hover:text-primary">
                 {b.brandName}
               </span>
             )}
-          </Link>
-        ))}
-      </div>
+          </div>
+
+          {/* Brand name below logo */}
+          {b.brandLogo && (
+            <span className="relative text-xs font-medium text-muted-foreground transition-colors group-hover:text-primary">
+              {b.brandName}
+            </span>
+          )}
+
+          {/* Arrow indicator */}
+          <ArrowRight className="absolute bottom-2.5 right-2.5 h-3.5 w-3.5 text-muted-foreground/0 transition-all group-hover:text-primary/60 group-hover:translate-x-0.5" />
+        </Link>
+      ))}
     </div>
   );
 }
