@@ -5,7 +5,7 @@ import { z } from "zod";
 import { CheckCircle2, ShoppingCart, Zap, ShieldCheck, Truck, RefreshCw, Battery } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { ProductGallery } from "@/components/products/ProductGallery";
-import { SpecificationsTable } from "@/components/products/SpecificationsTable";
+import { SpecificationsTable, flattenSpecs } from "@/components/products/SpecificationsTable";
 import { ProductCard } from "@/components/products/ProductCard";
 import { Price } from "@/components/common/Price";
 import { QuantityStepper } from "@/components/common/QuantityStepper";
@@ -133,8 +133,8 @@ function PdpPage() {
     });
   };
 
-  const specKeys = data.specs ? Object.entries(data.specs) : [];
-  const topSpecs = specKeys.slice(0, 4);
+  const allFlatSpecs = flattenSpecs(data.specs);
+  const topSpecs = allFlatSpecs.slice(0, 4);
 
   return (
     <div className="bg-muted/30 min-h-screen pb-16">

@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
-import { useForm, useFieldArray, Controller } from "react-hook-form";
+import { useForm, useFieldArray, Controller, UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -14,7 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Spinner } from "@/components/feedback/Spinner";
-import { ArrowLeft, Save, Plus, Trash2, Image as ImageIcon } from "lucide-react";
+import { ArrowLeft, Save, Plus, Trash2, Image as ImageIcon, ChevronDown, ChevronRight } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 
 const formSchema = z.object({
@@ -28,8 +28,11 @@ const formSchema = z.object({
   brandId: z.string().uuid("Brand is required"),
   compatibleVehicleIds: z.array(z.string().uuid()).default([]),
   specs: z.array(z.object({
-    key: z.string().min(1, "Key is required"),
-    value: z.string().min(1, "Value is required")
+    groupName: z.string().min(1, "Group name is required"),
+    items: z.array(z.object({
+      key: z.string().min(1, "Key is required"),
+      value: z.string().min(1, "Value is required")
+    })).default([])
   })).default([])
 });
 
@@ -51,7 +54,7 @@ function AddProductPage() {
   const subCategories = selectedRootCat?.subCategories || [];
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as any,
     defaultValues: {
       productName: "",
       productDescription: "",
@@ -64,7 +67,7 @@ function AddProductPage() {
     }
   });
 
-  const { fields: specFields, append: appendSpec, remove: removeSpec } = useFieldArray({
+  const { fields: specGroups, append: appendGroup, remove: removeGroup } = useFieldArray({
     control: form.control,
     name: "specs"
   });
@@ -81,11 +84,18 @@ function AddProductPage() {
   });
 
   const onSubmit = (data: FormValues) => {
-    // Transform specs array to Record<string, string>
-    const specsRecord: Record<string, string> = {};
-    data.specs.forEach(s => {
-      if (s.key.trim() && s.value.trim()) {
-        specsRecord[s.key.trim()] = s.value.trim();
+    // Transform grouped specs into nested Record
+    const specsRecord: Record<string, Record<string, string>> = {};
+    data.specs.forEach(group => {
+      if (!group.groupName.trim()) return;
+      const groupSpecs: Record<string, string> = {};
+      group.items.forEach(item => {
+        if (item.key.trim() && item.value.trim()) {
+          groupSpecs[item.key.trim()] = item.value.trim();
+        }
+      });
+      if (Object.keys(groupSpecs).length > 0) {
+        specsRecord[group.groupName.trim()] = groupSpecs;
       }
     });
 
@@ -129,7 +139,7 @@ function AddProductPage() {
         </div>
       </div>
 
-      <form id="product-form" onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col lg:flex-row gap-6">
+      <form id="product-form" onSubmit={form.handleSubmit(onSubmit as any)} className="flex flex-col lg:flex-row gap-6">
         
         {/* LEFT COLUMN - MAIN DETAILS (70%) */}
         <div className="flex-1 space-y-6">
@@ -190,32 +200,25 @@ function AddProductPage() {
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Specifications</CardTitle>
-                <CardDescription>Technical details like voltage, capacity, terminal type.</CardDescription>
+                <CardDescription>Group specs under headings like "Warranty Terms", "Technical Details", etc.</CardDescription>
               </div>
-              <Button type="button" variant="outline" size="sm" onClick={() => appendSpec({ key: "", value: "" })}>
-                <Plus className="h-4 w-4 mr-2" /> Add Spec
+              <Button type="button" variant="outline" size="sm" onClick={() => appendGroup({ groupName: "", items: [{ key: "", value: "" }] })}>
+                <Plus className="h-4 w-4 mr-2" /> Add Group
               </Button>
             </CardHeader>
-            <CardContent className="space-y-3">
-              {specFields.length === 0 ? (
+            <CardContent className="space-y-4">
+              {specGroups.length === 0 ? (
                 <div className="text-center py-6 text-sm text-muted-foreground border border-dashed rounded-lg bg-muted/20">
-                  No specifications added. Click "Add Spec" to start.
+                  No specifications added. Click "Add Group" to start.
                 </div>
               ) : (
-                specFields.map((field, index) => (
-                  <div key={field.id} className="flex gap-3 items-start">
-                    <div className="flex-1 space-y-1">
-                      <Input placeholder="Key (e.g. Voltage)" {...form.register(`specs.${index}.key`)} />
-                      {form.formState.errors.specs?.[index]?.key && <p className="text-[10px] text-red-500">{form.formState.errors.specs[index].key?.message}</p>}
-                    </div>
-                    <div className="flex-1 space-y-1">
-                      <Input placeholder="Value (e.g. 12V)" {...form.register(`specs.${index}.value`)} />
-                      {form.formState.errors.specs?.[index]?.value && <p className="text-[10px] text-red-500">{form.formState.errors.specs[index].value?.message}</p>}
-                    </div>
-                    <Button type="button" variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 shrink-0" onClick={() => removeSpec(index)}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+                specGroups.map((group, groupIndex) => (
+                  <SpecGroupEditor
+                    key={group.id}
+                    form={form}
+                    groupIndex={groupIndex}
+                    onRemoveGroup={() => removeGroup(groupIndex)}
+                  />
                 ))
               )}
             </CardContent>
@@ -343,6 +346,102 @@ function AddProductPage() {
           Save Product
         </Button>
       </div>
+    </div>
+  );
+}
+
+function SpecGroupEditor({
+  form,
+  groupIndex,
+  onRemoveGroup,
+}: {
+  form: any;
+  groupIndex: number;
+  onRemoveGroup: () => void;
+}) {
+  const { fields: itemFields, append: appendItem, remove: removeItem } = useFieldArray({
+    control: form.control,
+    name: `specs.${groupIndex}.items` as const,
+  });
+
+  const [collapsed, setCollapsed] = useState(false);
+
+  return (
+    <div className="border rounded-lg bg-muted/20 overflow-hidden">
+      {/* Group Header */}
+      <div className="flex items-center gap-2 p-3 bg-muted/40 border-b">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="h-6 w-6 shrink-0"
+          onClick={() => setCollapsed(!collapsed)}
+        >
+          {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+        </Button>
+        <div className="flex-1">
+          <Input
+            placeholder="Group Name (e.g. Warranty Terms, Technical Details)"
+            className="bg-background font-medium"
+            {...form.register(`specs.${groupIndex}.groupName`)}
+          />
+          {form.formState.errors.specs?.[groupIndex]?.groupName && (
+            <p className="text-[10px] text-red-500 mt-1">{form.formState.errors.specs[groupIndex]?.groupName?.message}</p>
+          )}
+        </div>
+        <span className="text-xs text-muted-foreground shrink-0">{itemFields.length} specs</span>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="text-destructive hover:bg-destructive/10 shrink-0 h-8 w-8"
+          onClick={onRemoveGroup}
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      </div>
+
+      {/* Group Items */}
+      {!collapsed && (
+        <div className="p-3 space-y-2">
+          {itemFields.map((item, itemIndex) => (
+            <div key={item.id} className="flex gap-2 items-start">
+              <div className="flex-1">
+                <Input
+                  placeholder="Key (e.g. Free Replacement)"
+                  className="text-sm"
+                  {...form.register(`specs.${groupIndex}.items.${itemIndex}.key`)}
+                />
+              </div>
+              <div className="flex-1">
+                <Input
+                  placeholder="Value (e.g. 36 Months)"
+                  className="text-sm"
+                  {...form.register(`specs.${groupIndex}.items.${itemIndex}.value`)}
+                />
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="text-destructive/70 hover:text-destructive hover:bg-destructive/10 shrink-0 h-9 w-9"
+                onClick={() => removeItem(itemIndex)}
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+          ))}
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="w-full border-dashed text-muted-foreground hover:text-foreground"
+            onClick={() => appendItem({ key: "", value: "" })}
+          >
+            <Plus className="h-3.5 w-3.5 mr-1.5" /> Add Spec
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
