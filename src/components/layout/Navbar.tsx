@@ -31,8 +31,9 @@ export function Navbar({ links = DEFAULT_LINKS }: { links?: NavLink[] }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
-  const { status, user, signOut } = useAuth();
-  const cart = useQuery(cartQuery(status === "authenticated"));
+  const { status, user, signOut, hasRole } = useAuth();
+  const isAdmin = hasRole("ADMIN");
+  const cart = useQuery(cartQuery(status === "authenticated" && !isAdmin));
   const cartCount = (cart.data?.cartItems ?? []).reduce((s, it) => s + it.quantity, 0);
 
   useEffect(() => {
