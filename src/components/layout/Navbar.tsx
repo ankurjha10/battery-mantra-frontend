@@ -59,7 +59,7 @@ export function Navbar({ links = DEFAULT_LINKS }: { links?: NavLink[] }) {
     >
       <Container
         size="xl"
-        className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4 py-3 sm:gap-6"
+        className="flex items-center justify-between gap-4 py-3 sm:gap-6"
       >
         <div className="flex min-w-0 items-center gap-2">
           <Button
@@ -86,7 +86,7 @@ export function Navbar({ links = DEFAULT_LINKS }: { links?: NavLink[] }) {
           </nav>
         </div>
 
-        <form onSubmit={onSearch} className="hidden min-w-0 lg:block">
+        <form onSubmit={onSearch} className="hidden flex-1 max-w-2xl mx-4 lg:block">
           <SearchBox
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -96,15 +96,7 @@ export function Navbar({ links = DEFAULT_LINKS }: { links?: NavLink[] }) {
         </form>
 
         <nav aria-label="Account actions" className="flex items-center gap-1 sm:gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="lg:hidden"
-            aria-label="Search"
-            onClick={() => navigate({ to: "/products" })}
-          >
-            <Search className="h-5 w-5" />
-          </Button>
+
           <Button variant="ghost" size="icon" aria-label="Wishlist" className="hidden sm:inline-flex">
             <Heart className="h-5 w-5" />
           </Button>
