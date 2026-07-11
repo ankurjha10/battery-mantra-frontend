@@ -29,6 +29,7 @@ import { Route as AdminVehiclesRouteImport } from './routes/admin.vehicles'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
+import { Route as AdminCallbacksRouteImport } from './routes/admin.callbacks'
 import { Route as AdminBrandsRouteImport } from './routes/admin.brands'
 import { Route as AdminBannersRouteImport } from './routes/admin.banners'
 import { Route as AuthRegisterRouteImport } from './routes/_auth.register'
@@ -136,6 +137,11 @@ const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
   path: '/categories',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminCallbacksRoute = AdminCallbacksRouteImport.update({
+  id: '/callbacks',
+  path: '/callbacks',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminBrandsRoute = AdminBrandsRouteImport.update({
   id: '/brands',
   path: '/brands',
@@ -188,6 +194,7 @@ export interface FileRoutesByFullPath {
   '/register': typeof AuthRegisterRoute
   '/admin/banners': typeof AdminBannersRoute
   '/admin/brands': typeof AdminBrandsRoute
+  '/admin/callbacks': typeof AdminCallbacksRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/users': typeof AdminUsersRoute
@@ -215,6 +222,7 @@ export interface FileRoutesByTo {
   '/register': typeof AuthRegisterRoute
   '/admin/banners': typeof AdminBannersRoute
   '/admin/brands': typeof AdminBrandsRoute
+  '/admin/callbacks': typeof AdminCallbacksRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/users': typeof AdminUsersRoute
@@ -245,6 +253,7 @@ export interface FileRoutesById {
   '/_auth/register': typeof AuthRegisterRoute
   '/admin/banners': typeof AdminBannersRoute
   '/admin/brands': typeof AdminBrandsRoute
+  '/admin/callbacks': typeof AdminCallbacksRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/users': typeof AdminUsersRoute
@@ -275,6 +284,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/admin/banners'
     | '/admin/brands'
+    | '/admin/callbacks'
     | '/admin/categories'
     | '/admin/orders'
     | '/admin/users'
@@ -302,6 +312,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/admin/banners'
     | '/admin/brands'
+    | '/admin/callbacks'
     | '/admin/categories'
     | '/admin/orders'
     | '/admin/users'
@@ -331,6 +342,7 @@ export interface FileRouteTypes {
     | '/_auth/register'
     | '/admin/banners'
     | '/admin/brands'
+    | '/admin/callbacks'
     | '/admin/categories'
     | '/admin/orders'
     | '/admin/users'
@@ -505,6 +517,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCategoriesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/callbacks': {
+      id: '/admin/callbacks'
+      path: '/callbacks'
+      fullPath: '/admin/callbacks'
+      preLoaderRoute: typeof AdminCallbacksRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/brands': {
       id: '/admin/brands'
       path: '/brands'
@@ -572,6 +591,7 @@ const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 interface AdminRouteChildren {
   AdminBannersRoute: typeof AdminBannersRoute
   AdminBrandsRoute: typeof AdminBrandsRoute
+  AdminCallbacksRoute: typeof AdminCallbacksRoute
   AdminCategoriesRoute: typeof AdminCategoriesRoute
   AdminOrdersRoute: typeof AdminOrdersRoute
   AdminUsersRoute: typeof AdminUsersRoute
@@ -585,6 +605,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminBannersRoute: AdminBannersRoute,
   AdminBrandsRoute: AdminBrandsRoute,
+  AdminCallbacksRoute: AdminCallbacksRoute,
   AdminCategoriesRoute: AdminCategoriesRoute,
   AdminOrdersRoute: AdminOrdersRoute,
   AdminUsersRoute: AdminUsersRoute,

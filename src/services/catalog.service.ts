@@ -5,6 +5,7 @@ import type {
   CategoryDetailResponse,
   CategoryListResponse,
   BannerResponse,
+  CreateCallbackRequest,
 } from "@/types/dto";
 
 export const categoriesService = {
@@ -26,4 +27,13 @@ export const brandsService = {
 export const bannersService = {
   active: (signal?: AbortSignal) =>
     apiFetch<BannerResponse[]>(endpoints.banners.active, { signal, auth: false }),
+};
+
+export const callbacksService = {
+  create: (req: CreateCallbackRequest) =>
+    apiFetch<void>(endpoints.callbacks.create, {
+      method: "POST",
+      body: JSON.stringify(req),
+      auth: false,
+    }),
 };

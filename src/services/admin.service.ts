@@ -18,6 +18,8 @@ import type {
   UpdateBannerRequest,
   VehicleResponse,
   CreateVehicleRequest,
+  CallbackResponse,
+  UpdateCallbackStatusRequest,
   UUID
 } from "@/types/dto";
 
@@ -61,6 +63,12 @@ export const adminService = {
     apiFetch<VehicleResponse>(endpoints.admin.vehicles.update(id), { method: "PUT", body: data }),
   deleteVehicle: (id: string) => 
     apiFetch<void>(endpoints.admin.vehicles.delete(id), { method: "DELETE" }),
+
+  // Callbacks
+  getAllCallbacks: () =>
+    apiFetch<CallbackResponse[]>(endpoints.admin.callbacks.list, { method: "GET" }),
+  updateCallbackStatus: (id: string, body: UpdateCallbackStatusRequest) =>
+    apiFetch<CallbackResponse>(endpoints.admin.callbacks.updateStatus(id), { method: "PATCH", body }),
 
   // Banners
   getAllBanners: () => apiFetch<BannerResponse[]>(endpoints.admin.banners.list, { method: "GET" }),

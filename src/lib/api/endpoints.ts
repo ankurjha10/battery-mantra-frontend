@@ -31,6 +31,9 @@ export const endpoints = {
   banners: {
     active: "/api/banners/active",
   },
+  callbacks: {
+    create: "/api/callbacks",
+  },
   vehicles: {
     list: "/api/vehicles",
     search: "/api/vehicles/search",
@@ -87,5 +90,9 @@ export const endpoints = {
       update: (id: string) => `/api/admin/vehicles/${encodeURIComponent(id)}`,
       delete: (id: string) => `/api/admin/vehicles/${encodeURIComponent(id)}`,
     },
+    callbacks: {
+      list: "/api/admin/callbacks",
+      updateStatus: (id: string) => `/api/admin/callbacks/${encodeURIComponent(id)}/status`,
+    }
   },
 } as const;

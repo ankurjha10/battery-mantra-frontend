@@ -286,3 +286,20 @@ export type UpdatePasswordRequest = {
   currentPassword?: string;
   newPassword?: string;
 };
+
+export type CallbackStatus = "PENDING" | "RESOLVED";
+
+export interface CallbackResponse {
+  callbackId: number;
+  mobileNumber: string;
+  status: CallbackStatus;
+  createdAt: string;
+}
+
+export interface CreateCallbackRequest {
+  mobileNumber: string;
+}
+
+export interface UpdateCallbackStatusRequest {
+  status: CallbackStatus;
+}

@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { callbacksService } from "@/services/catalog.service";
 import { PhoneCall, Send } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -7,7 +9,16 @@ import { Container } from "@/components/layout/Container";
 
 export function CallbackBanner() {
   const [mobileNo, setMobileNo] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const mutation = useMutation({
+    mutationFn: (mobileNumber: string) => callbacksService.create({ mobileNumber }),
+    onSuccess: () => {
+      toast.success("Request sent! We will call you back shortly.");
+      setMobileNo("");
+    },
+    onError: () => {
+      toast.error("Failed to send request. Please try again.");
+    }
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,13 +27,7 @@ export function CallbackBanner() {
       return;
     }
 
-    setIsSubmitting(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
-      toast.success("Request sent! We will call you back shortly.");
-      setMobileNo("");
-    }, 1000);
+    mutation.mutate(mobileNo);
   };
 
   return (
@@ -35,19 +40,22 @@ export function CallbackBanner() {
         <div className="grid lg:grid-cols-2 gap-10 items-center">
           {/* Graphic Side */}
           <div className="hidden lg:flex justify-center relative">
-            <div className="relative">
-              <div className="absolute inset-0 bg-primary/20 rounded-full blur-2xl animate-pulse" />
-              <div className="relative bg-background border border-border shadow-xl rounded-full p-8 flex items-center justify-center">
-                <PhoneCall className="w-24 h-24 text-primary" strokeWidth={1.5} />
-              </div>
-            </div>
+            <img 
+              src="/images/requestCallback Section image.png" 
+              alt="Request Callback"
+              className="w-full max-w-lg xl:max-w-xl h-auto object-contain drop-shadow-xl scale-110 hover:scale-115 transition-transform duration-500"
+            />
           </div>
 
           {/* Form Side */}
           <div className="flex flex-col space-y-6 text-center lg:text-left">
             <div className="space-y-3">
-              <h2 className="text-3xl sm:text-4xl font-display font-bold text-foreground flex items-center justify-center lg:justify-start gap-3">
-                <PhoneCall className="w-8 h-8 text-primary lg:hidden" />
+              <h2 className="text-3xl sm:text-4xl font-display font-bold text-foreground flex flex-col lg:flex-row items-center justify-center lg:justify-start gap-4">
+                <img 
+                  src="/images/requestCallback Section image.png" 
+                  alt=""
+                  className="w-40 h-40 sm:w-48 sm:h-48 object-contain lg:hidden mb-2 lg:mb-0 scale-110"
+                />
                 Request a CallBack
               </h2>
               <p className="text-muted-foreground text-lg">
@@ -63,17 +71,17 @@ export function CallbackBanner() {
                   className="flex-1 h-12 text-lg shadow-sm"
                   value={mobileNo}
                   onChange={(e) => setMobileNo(e.target.value)}
-                  disabled={isSubmitting}
+                  disabled={mutation.isPending}
                 />
                 <Button 
                   type="submit" 
                   variant="brand" 
                   size="lg" 
                   className="h-12 px-8 text-base shadow-md hover:shadow-lg transition-shadow"
-                  disabled={isSubmitting}
+                  disabled={mutation.isPending}
                 >
-                  {isSubmitting ? "Sending..." : "Send Request"}
-                  {!isSubmitting && <Send className="ml-2 w-4 h-4" />}
+                  {mutation.isPending ? "Sending..." : "Send Request"}
+                  {!mutation.isPending && <Send className="ml-2 w-4 h-4" />}
                 </Button>
               </div>
             </form>
