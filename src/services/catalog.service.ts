@@ -33,7 +33,7 @@ export const callbacksService = {
   create: (req: CreateCallbackRequest) =>
     apiFetch<void>(endpoints.callbacks.create, {
       method: "POST",
-      body: JSON.stringify(req),
+      body: req,
       auth: false,
     }),
 };
