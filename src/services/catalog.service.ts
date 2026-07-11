@@ -4,6 +4,7 @@ import type {
   BrandResponse,
   CategoryDetailResponse,
   CategoryListResponse,
+  BannerResponse,
 } from "@/types/dto";
 
 export const categoriesService = {
@@ -20,4 +21,9 @@ export const brandsService = {
     apiFetch<BrandResponse[]>(endpoints.brands.list, { signal, auth: false }),
   featured: (signal?: AbortSignal) =>
     apiFetch<BrandResponse[]>(endpoints.brands.featured, { signal, auth: false }),
+};
+
+export const bannersService = {
+  active: (signal?: AbortSignal) =>
+    apiFetch<BannerResponse[]>(endpoints.banners.active, { signal, auth: false }),
 };

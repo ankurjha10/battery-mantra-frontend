@@ -5,6 +5,7 @@ import { Container } from "@/components/layout/Container";
 import { SectionHeading } from "@/components/layout/SectionHeading";
 import { Button } from "@/components/ui/button";
 import { VehicleFinderWidget } from "@/components/home/VehicleFinderWidget";
+import { BannerCarousel } from "@/components/home/BannerCarousel";
 import { CategoryGrid } from "@/components/home/CategoryGrid";
 import { BrandStrip } from "@/components/home/BrandStrip";
 import { FeaturedProducts } from "@/components/home/FeaturedProducts";
@@ -15,6 +16,7 @@ import {
   rootCategoriesQuery,
   featuredBrandsQuery,
   vehiclesListQuery,
+  bannersListQuery,
 } from "@/queries";
 import { APP } from "@/constants/app";
 
@@ -40,6 +42,7 @@ export const Route = createFileRoute("/")({
     void context.queryClient.prefetchQuery(rootCategoriesQuery());
     void context.queryClient.prefetchQuery(featuredBrandsQuery());
     void context.queryClient.prefetchQuery(vehiclesListQuery());
+    void context.queryClient.prefetchQuery(bannersListQuery());
   },
   component: HomePage,
 });
@@ -77,6 +80,8 @@ function HomePage() {
         }
         media={<VehicleFinderWidget />}
       />
+
+      <BannerCarousel />
 
       <Container size="xl" className="space-y-16 py-12 sm:py-16">
         <section aria-labelledby="categories">

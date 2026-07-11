@@ -13,6 +13,9 @@ import type {
   UpdateCategoryRequest,
   BrandResponse,
   BrandRequest,
+  BannerResponse,
+  CreateBannerRequest,
+  UpdateBannerRequest,
   VehicleResponse,
   CreateVehicleRequest,
   UUID
@@ -54,8 +57,17 @@ export const adminService = {
   // Vehicles
   createVehicle: (body: CreateVehicleRequest) => 
     apiFetch<VehicleResponse>(endpoints.admin.vehicles.create, { method: "POST", body }),
-  updateVehicle: (id: UUID, body: CreateVehicleRequest) => 
-    apiFetch<VehicleResponse>(endpoints.admin.vehicles.update(id), { method: "PUT", body }),
-  deleteVehicle: (id: UUID) => 
+  updateVehicle: (id: string, data: CreateVehicleRequest) => 
+    apiFetch<VehicleResponse>(endpoints.admin.vehicles.update(id), { method: "PUT", body: data }),
+  deleteVehicle: (id: string) => 
     apiFetch<void>(endpoints.admin.vehicles.delete(id), { method: "DELETE" }),
+
+  // Banners
+  getAllBanners: () => apiFetch<BannerResponse[]>(endpoints.admin.banners.list, { method: "GET" }),
+  createBanner: (data: CreateBannerRequest) => 
+    apiFetch<BannerResponse>(endpoints.admin.banners.create, { method: "POST", body: data }),
+  updateBanner: (id: string, data: UpdateBannerRequest) => 
+    apiFetch<BannerResponse>(endpoints.admin.banners.update(id), { method: "PUT", body: data }),
+  deleteBanner: (id: string) => 
+    apiFetch<void>(endpoints.admin.banners.delete(id), { method: "DELETE" }),
 };

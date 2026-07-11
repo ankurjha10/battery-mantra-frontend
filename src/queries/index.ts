@@ -1,7 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 import { queryKeys } from "@/constants/queryKeys";
 import { productsService } from "@/services/products.service";
-import { categoriesService, brandsService } from "@/services/catalog.service";
+import { categoriesService, brandsService, bannersService } from "@/services/catalog.service";
 import { vehiclesService } from "@/services/vehicles.service";
 import { cartService } from "@/services/cart.service";
 import { ordersService } from "@/services/orders.service";
@@ -120,6 +120,13 @@ export const adminUsersQuery = () =>
   queryOptions({
     queryKey: queryKeys.admin.users(),
     queryFn: () => adminService.getAllUsers(),
+    staleTime: 60_000,
+  });
+
+export const bannersListQuery = () =>
+  queryOptions({
+    queryKey: queryKeys.banners.active(),
+    queryFn: ({ signal }) => bannersService.active(signal),
     staleTime: 60_000,
   });
 

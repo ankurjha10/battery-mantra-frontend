@@ -28,6 +28,10 @@ export const queryKeys = {
     list: () => [...queryKeys.brands.all, "list"] as const,
     featured: () => [...queryKeys.brands.all, "featured"] as const,
   },
+  banners: {
+    all: ["banners"] as const,
+    active: () => [...queryKeys.banners.all, "active"] as const,
+  },
   vehicles: {
     all: ["vehicles"] as const,
     list: () => [...queryKeys.vehicles.all, "list"] as const,

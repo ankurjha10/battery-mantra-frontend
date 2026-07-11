@@ -66,6 +66,24 @@ export type BrandRequest = {
   featured?: boolean;
 };
 
+/* ---------- Banners ---------- */
+export type BannerResponse = {
+  bannerId: UUID;
+  title?: string;
+  imageUrl: string;
+  linkUrl?: string;
+  isActive: boolean;
+  displayOrder: number;
+};
+export type CreateBannerRequest = {
+  title?: string;
+  imageUrl: string;
+  linkUrl?: string;
+  isActive?: boolean;
+  displayOrder?: number;
+};
+export type UpdateBannerRequest = Partial<CreateBannerRequest>;
+
 /* ---------- Categories ---------- */
 export type CategoryListResponse = {
   categoryId: UUID;

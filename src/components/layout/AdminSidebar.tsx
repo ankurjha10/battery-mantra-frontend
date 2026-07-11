@@ -1,5 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { LayoutDashboard, Users, ShoppingCart, Package, LogOut, Layers, Tag, Car } from "lucide-react";
+import { LayoutDashboard, Users, ShoppingCart, Package, LogOut, Layers, Tag, Car, Image } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -22,6 +22,7 @@ const navigation = [
   { name: "Brands", href: "/admin/brands", icon: Tag },
   { name: "Vehicles", href: "/admin/vehicles", icon: Car },
   { name: "Users", href: "/admin/users", icon: Users },
+  { name: "Banners", href: "/admin/banners", icon: Image },
 ];
 
 export function AdminSidebar() {
