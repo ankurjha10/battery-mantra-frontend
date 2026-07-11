@@ -9,9 +9,9 @@ export function CategoryGrid() {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
+      <div className="flex overflow-x-auto gap-3 pb-2 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] lg:grid lg:grid-cols-6 lg:overflow-visible lg:pb-0 lg:snap-none">
         {Array.from({ length: 6 }).map((_, i) => (
-          <SkeletonBlock key={i} className="h-28" />
+          <SkeletonBlock key={i} className="h-28 min-w-[120px] lg:min-w-0 snap-start" />
         ))}
       </div>
     );
@@ -21,13 +21,13 @@ export function CategoryGrid() {
   const sorted = [...data].sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
 
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
+    <div className="flex overflow-x-auto gap-3 pb-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] lg:grid lg:grid-cols-6 lg:overflow-visible lg:pb-0 lg:snap-none">
       {sorted.map((c) => (
         <Link
           key={c.categoryId}
           to="/products"
           search={{ categoryId: c.categoryId }}
-          className="group flex flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card p-4 text-center transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-product"
+          className="group flex flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card p-4 text-center transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-product min-w-[120px] snap-start lg:min-w-0"
         >
           <span className="grid h-16 w-16 place-items-center text-primary transition-transform group-hover:scale-110">
             {c.iconUrl ? (

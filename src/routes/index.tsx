@@ -11,6 +11,7 @@ import { BrandStrip } from "@/components/home/BrandStrip";
 import { FeaturedProducts } from "@/components/home/FeaturedProducts";
 import { WhyChooseUs } from "@/components/home/WhyChooseUs";
 import { FaqAccordion } from "@/components/home/FaqAccordion";
+import { CallbackBanner } from "@/components/home/CallbackBanner";
 import {
   productListQuery,
   rootCategoriesQuery,
@@ -49,52 +50,61 @@ export const Route = createFileRoute("/")({
 
 function HomePage() {
   return (
-    <div>
-      <HeroSection
-        eyebrow={
-          <span className="inline-flex items-center gap-1.5">
-            <Zap className="h-3 w-3" /> Genuine batteries · Free fitment
-          </span>
-        }
-        title={
-          <>
-            India&apos;s most trusted
-            <br />
-            <span className="text-primary">battery store</span>
-          </>
-        }
-        description="Find the right battery for any car, bike, inverter or commercial vehicle — delivered and installed at your doorstep."
-        primaryAction={
-          <Button asChild variant="brand" size="lg">
-            <Link to="/products">
-              Shop batteries <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
-        }
-        secondaryAction={
-          <Button asChild variant="brand-outline" size="lg">
-            <Link to="/vehicle-finder">
-              <BatteryCharging className="h-4 w-4" /> Find by vehicle
-            </Link>
-          </Button>
-        }
-        media={<VehicleFinderWidget />}
-      />
+    <div className="flex flex-col">
+      <div className="order-2 lg:order-1">
+        <HeroSection
+          eyebrow={
+            <span className="inline-flex items-center gap-1.5">
+              <Zap className="h-3 w-3" /> Genuine batteries · Free fitment
+            </span>
+          }
+          title={
+            <>
+              India&apos;s most trusted
+              <br />
+              <span className="text-primary">battery store</span>
+            </>
+          }
+          description="Find the right battery for any car, bike, inverter or commercial vehicle — delivered and installed at your doorstep."
+          primaryAction={
+            <Button asChild variant="brand" size="lg">
+              <Link to="/products">
+                Shop batteries <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
+          }
+          secondaryAction={
+            <Button asChild variant="brand-outline" size="lg">
+              <Link to="/vehicle-finder">
+                <BatteryCharging className="h-4 w-4" /> Find by vehicle
+              </Link>
+            </Button>
+          }
+          media={<VehicleFinderWidget />}
+        />
+      </div>
 
-      <BannerCarousel />
+      <div className="order-3 lg:order-2">
+        <BannerCarousel />
+      </div>
 
-      <Container size="xl" className="space-y-16 py-12 sm:py-16">
-        <section aria-labelledby="categories">
-          <SectionHeading
-            eyebrow="Browse"
-            title={<span id="categories">Shop by category</span>}
-            description="Pick from a curated catalogue of leading battery categories."
-          />
-          <div className="mt-6">
-            <CategoryGrid />
-          </div>
-        </section>
+      <div className="order-1 lg:order-3 w-full bg-background pt-6 lg:pt-12">
+        <Container size="xl">
+          <section aria-labelledby="categories">
+            <SectionHeading
+              eyebrow="Browse"
+              title={<span id="categories">Shop by category</span>}
+              description="Pick from a curated catalogue of leading battery categories."
+            />
+            <div className="mt-6">
+              <CategoryGrid />
+            </div>
+          </section>
+        </Container>
+      </div>
 
+      <div className="order-4 w-full">
+        <Container size="xl" className="space-y-16 py-12 sm:py-16">
         <section aria-labelledby="brands">
           <SectionHeading
             eyebrow="Trusted brands"
@@ -143,7 +153,12 @@ function HomePage() {
             <FaqAccordion />
           </div>
         </section>
-      </Container>
+        </Container>
+      </div>
+
+      <div className="order-5 w-full">
+        <CallbackBanner />
+      </div>
     </div>
   );
 }

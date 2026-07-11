@@ -53,7 +53,7 @@ export function BannerCarousel() {
   }
 
   return (
-    <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 mb-4 group">
+    <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 sm:mt-12 mb-4 group">
       <div className="overflow-hidden rounded-2xl" ref={emblaRef}>
         <div className="flex touch-pan-y touch-pinch-zoom">
           {banners.map((banner) => (

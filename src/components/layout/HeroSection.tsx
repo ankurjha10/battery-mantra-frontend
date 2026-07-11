@@ -21,8 +21,8 @@ export function HeroSection({
 }) {
   return (
     <section className={cn("relative overflow-hidden bg-surface", className)}>
-      <Container size="xl" className="grid gap-10 py-12 sm:py-16 lg:grid-cols-2 lg:items-center lg:py-24">
-        <div className="min-w-0">
+      <Container size="xl" className="grid gap-6 py-6 sm:py-16 lg:gap-10 lg:grid-cols-2 lg:items-center lg:py-24">
+        <div className="hidden lg:block min-w-0">
           {eyebrow ? (
             <div className="mb-3 inline-flex items-center rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-primary">
               {eyebrow}
