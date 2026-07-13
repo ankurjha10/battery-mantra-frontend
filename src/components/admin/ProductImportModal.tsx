@@ -41,15 +41,34 @@ export function ProductImportModal({ isOpen, onClose }: ProductImportModalProps)
         setImporting(true);
         setProgress({ current: 0, total: rows.length });
         let successCount = 0;
+        let skipCount = 0;
+        const missingMappings = new Set<string>();
+
+        const CATEGORY_ALIASES: Record<string, string> = {
+          "car battery": "car batteries",
+          "two wheeler batteries": "2 wheeler batteries",
+          "ac voltage stabilizers": "ac voltage stabilizer",
+          "e riksha battery": "e-rickshaw batteries"
+        };
+
+        const BRAND_ALIASES: Record<string, string> = {
+          "sf sonic": "sf batteries",
+          "powerzone": "power zone",
+          "unknown": ""
+        };
 
         for (let i = 0; i < rows.length; i++) {
           const row = rows[i];
           try {
             // Mapping Logic
-            const brandId = brands?.find(b => b.brandName.toLowerCase() === row["BrandName"]?.trim().toLowerCase())?.brandId;
+            let rawBrandName = row["BrandName"]?.trim().toLowerCase() || "";
+            rawBrandName = BRAND_ALIASES[rawBrandName] ?? rawBrandName;
+            const brandId = brands?.find(b => b.brandName.toLowerCase() === rawBrandName)?.brandId;
             
             // Allow subcategory mapping by checking all categories (we flatten if needed, or assume categoryName is unique)
-            const categoryName = row["CategoryName"]?.trim().toLowerCase();
+            let rawCategoryName = row["CategoryName"]?.trim().toLowerCase() || "";
+            rawCategoryName = CATEGORY_ALIASES[rawCategoryName] ?? rawCategoryName;
+            const categoryName = rawCategoryName;
             let categoryId: string | undefined;
             if (categories) {
               for (const c of categories) {
@@ -110,15 +129,33 @@ export function ProductImportModal({ isOpen, onClose }: ProductImportModalProps)
               specs: hasSpecs ? specs : undefined
             };
 
+            if (!categoryId && rawCategoryName) {
+              missingMappings.add(`Category: ${row["CategoryName"]}`);
+              throw new Error(`Category mapping not found for ${row["CategoryName"]}`);
+            }
+            if (!brandId && rawBrandName) {
+              missingMappings.add(`Brand: ${row["BrandName"]}`);
+              throw new Error(`Brand mapping not found for ${row["BrandName"]}`);
+            }
+
             await adminService.createProduct(payload);
             successCount++;
-          } catch (err) {
-            console.error(`Failed at row ${i + 1}:`, err);
+          } catch (err: any) {
+            console.error(`Skipped row ${i + 1} (${row["ProductName"]}):`, err?.message || err);
+            skipCount++;
           }
           setProgress({ current: i + 1, total: rows.length });
         }
 
-        toast.success(`Successfully imported ${successCount} out of ${rows.length} products!`);
+        if (skipCount > 0) {
+          toast.warning(`Imported ${successCount}. Skipped ${skipCount} products due to missing DB categories/brands. Check console for details.`, { duration: 10000 });
+          if (missingMappings.size > 0) {
+            console.warn("The following Categories/Brands from the CSV do not exist in the Database:", Array.from(missingMappings));
+          }
+        } else {
+          toast.success(`Successfully imported ${successCount} out of ${rows.length} products!`);
+        }
+        
         queryClient.invalidateQueries({ queryKey: ["products"] });
         setImporting(false);
         setProgress(null);
