@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { productListQuery } from "@/queries";
 import { adminService } from "@/services/admin.service";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -7,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/feedback/Spinner";
 import { Trash2, Plus, Edit } from "lucide-react";
 import { toast } from "sonner";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,6 +28,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { ProductImportModal } from "@/components/admin/ProductImportModal";
 
 export const Route = createFileRoute("/admin/products/")({
   component: AdminProducts,
@@ -35,10 +38,23 @@ function AdminProducts() {
   const queryClient = useQueryClient();
   const { data: products, isLoading } = useQuery(productListQuery());
   const [currentPage, setCurrentPage] = useState(1);
+  const [activeCategory, setActiveCategory] = useState("ALL");
+  const [activeBrand, setActiveBrand] = useState("ALL");
+  const [isImportOpen, setIsImportOpen] = useState(false);
   const PAGE_SIZE = 15;
 
-  const totalPages = Math.ceil((products?.length || 0) / PAGE_SIZE);
-  const paginatedProducts = products?.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+  const categoryFilteredProducts = activeCategory === "ALL"
+    ? products
+    : products?.filter(p => p.productCategory === activeCategory);
+
+  const availableBrands = Array.from(new Set(categoryFilteredProducts?.map(p => p.brandName).filter(Boolean) as string[])).sort();
+
+  const filteredProducts = activeBrand === "ALL"
+    ? categoryFilteredProducts
+    : categoryFilteredProducts?.filter(p => p.brandName === activeBrand);
+
+  const totalPages = Math.ceil((filteredProducts?.length || 0) / PAGE_SIZE);
+  const paginatedProducts = filteredProducts?.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => adminService.deleteProduct(id),
@@ -56,12 +72,52 @@ function AdminProducts() {
           <h2 className="font-display text-3xl font-bold tracking-tight">Products</h2>
           <p className="text-muted-foreground">Manage your product catalog.</p>
         </div>
-        <Button asChild>
-          <Link to="/admin/products/new">
-            <Plus className="mr-2 h-4 w-4" /> Add Product
-          </Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={() => setIsImportOpen(true)}>
+            Import CSV
+          </Button>
+          <Button asChild>
+            <Link to="/admin/products/new">
+              <Plus className="mr-2 h-4 w-4" /> Add Product
+            </Link>
+          </Button>
+        </div>
       </div>
+
+      {products && products.length > 0 && (
+        <Tabs value={activeCategory} onValueChange={(val) => { setActiveCategory(val); setActiveBrand("ALL"); setCurrentPage(1); }} className="w-full">
+          <TabsList className="mb-4 flex-wrap h-auto gap-1 bg-muted/50 p-1">
+            <TabsTrigger value="ALL" className="rounded-md">All Categories</TabsTrigger>
+            {Array.from(new Set(products.map(p => p.productCategory).filter(Boolean) as string[])).sort().map(cat => (
+              <TabsTrigger key={cat} value={cat} className="rounded-md">{cat}</TabsTrigger>
+            ))}
+          </TabsList>
+          
+          {activeCategory !== "ALL" && availableBrands.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-4">
+              <Button 
+                variant={activeBrand === "ALL" ? "default" : "outline"} 
+                size="sm" 
+                onClick={() => { setActiveBrand("ALL"); setCurrentPage(1); }}
+                className="h-7 text-xs rounded-full px-4"
+              >
+                All Brands
+              </Button>
+              {availableBrands.map(brand => (
+                <Button 
+                  key={brand}
+                  variant={activeBrand === brand ? "default" : "outline"} 
+                  size="sm" 
+                  onClick={() => { setActiveBrand(brand); setCurrentPage(1); }}
+                  className="h-7 text-xs rounded-full px-4"
+                >
+                  {brand}
+                </Button>
+              ))}
+            </div>
+          )}
+        </Tabs>
+      )}
 
       <div className="rounded-md border bg-card">
         <Table>
@@ -146,8 +202,8 @@ function AdminProducts() {
         <div className="mt-4 flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
             Showing <span className="font-medium">{(currentPage - 1) * PAGE_SIZE + 1}</span> to{" "}
-            <span className="font-medium">{Math.min(currentPage * PAGE_SIZE, products?.length || 0)}</span> of{" "}
-            <span className="font-medium">{products?.length}</span> results
+            <span className="font-medium">{Math.min(currentPage * PAGE_SIZE, filteredProducts?.length || 0)}</span> of{" "}
+            <span className="font-medium">{filteredProducts?.length}</span> results
           </p>
           <Pagination className="w-auto mx-0">
             <PaginationContent>
@@ -170,6 +226,8 @@ function AdminProducts() {
           </Pagination>
         </div>
       )}
+
+      <ProductImportModal isOpen={isImportOpen} onClose={() => setIsImportOpen(false)} />
     </div>
   );
 }
