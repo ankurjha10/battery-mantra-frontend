@@ -132,8 +132,12 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
     if (initialRootId && !selectedRootId) setSelectedRootId(initialRootId);
   }, [initialRootId, selectedRootId]);
 
-  const selectedRootCat = rootCategories.find(c => c.categoryId === selectedRootId);
-  const subCategories = selectedRootCat?.subCategories || [];
+  const selectedRootCategory = rootCategories.find(c => c.categoryId === selectedRootId);
+  const isVehicleApplicable = selectedRootCategory 
+    ? !/inverter|stabilizer|ups|solar/i.test(selectedRootCategory.categoryName) 
+    : true;
+  
+  const subCategories = selectedRootCategory?.subCategories || [];
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema) as any,
@@ -192,6 +196,9 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
       specsRecord["originalPrice"] = data.originalPrice.toString() as any;
     }
 
+    const rootCat = rootCategories?.find(c => c.categoryId === data.categoryId);
+    const applicable = rootCat ? !/inverter|stabilizer|ups|solar/i.test(rootCat.categoryName) : true;
+
     const payload = {
       productName: data.productName,
       productDescription: data.productDescription || undefined,
@@ -201,7 +208,7 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
       productImage: data.productImage || undefined,
       categoryId: data.categoryId,
       brandId: data.brandId,
-      compatibleVehicleIds: data.compatibleVehicleIds,
+      compatibleVehicleIds: applicable ? data.compatibleVehicleIds : [],
       specs: Object.keys(specsRecord).length > 0 ? specsRecord : undefined
     };
 
@@ -409,9 +416,10 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
             </CardContent>
           </Card>
 
-          <Card className="shadow-sm">
-            <CardHeader>
-              <CardTitle>Compatibility</CardTitle>
+          {isVehicleApplicable && (
+            <Card className="shadow-sm">
+              <CardHeader>
+                <CardTitle>Compatibility</CardTitle>
               <CardDescription>Select vehicles this battery fits.</CardDescription>
             </CardHeader>
             <CardContent>
@@ -460,6 +468,7 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
               </Tabs>
             </CardContent>
           </Card>
+          )}
         </div>
       </form>
 

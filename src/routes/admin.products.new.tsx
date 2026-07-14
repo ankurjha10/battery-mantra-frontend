@@ -123,6 +123,9 @@ function AddProductPage() {
       specsRecord["originalPrice"] = data.originalPrice.toString() as any;
     }
 
+    const rootCat = rootCategories.find(c => c.categoryId === data.categoryId);
+    const applicable = rootCat ? !/inverter|stabilizer|ups|solar/i.test(rootCat.categoryName) : true;
+
     const payload = {
       productName: data.productName,
       productDescription: data.productDescription || undefined,
@@ -132,7 +135,7 @@ function AddProductPage() {
       productImage: data.productImage || undefined,
       categoryId: data.categoryId,
       brandId: data.brandId,
-      compatibleVehicleIds: data.compatibleVehicleIds,
+      compatibleVehicleIds: applicable ? data.compatibleVehicleIds : [],
       specs: Object.keys(specsRecord).length > 0 ? specsRecord : undefined
     };
 
@@ -150,6 +153,11 @@ function AddProductPage() {
       form.setValue("compatibleVehicleIds", [...current, id]);
     }
   };
+
+  const selectedRootCategory = rootCategories.find(c => c.categoryId === selectedRootId);
+  const isVehicleApplicable = selectedRootCategory 
+    ? !/inverter|stabilizer|ups|solar/i.test(selectedRootCategory.categoryName) 
+    : true;
 
   return (
     <div className="mx-auto max-w-5xl space-y-6 pb-20">
@@ -340,10 +348,11 @@ function AddProductPage() {
             </CardContent>
           </Card>
 
-          <Card className="shadow-sm">
-            <CardHeader>
-              <CardTitle>Compatibility</CardTitle>
-              <CardDescription>Select vehicles this battery fits.</CardDescription>
+          {isVehicleApplicable && (
+            <Card className="shadow-sm">
+              <CardHeader>
+                <CardTitle>Compatibility</CardTitle>
+                <CardDescription>Select vehicles this battery fits.</CardDescription>
             </CardHeader>
             <CardContent>
               <Tabs defaultValue="CAR" className="w-full">
@@ -391,6 +400,8 @@ function AddProductPage() {
               </Tabs>
             </CardContent>
           </Card>
+          )}
+
         </div>
       </form>
 
