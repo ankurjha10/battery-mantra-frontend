@@ -8,9 +8,19 @@ export type UUID = string;
 /* ---------- Auth ---------- */
 export type LoginRequest = { username: string; password: string };
 export type LoginResponse = { 
-  token: string; 
+  token: string;
+  refreshToken: string; 
   id: UUID;
   role: string;
+};
+
+export type RefreshTokenRequest = {
+  refreshToken: string;
+};
+
+export type RefreshTokenResponse = {
+  token: string;
+  refreshToken: string;
 };
 
 export type RegisterRole = "ADMIN" | "CUSTOMER";

@@ -68,7 +68,7 @@ function LoginPage() {
         // ignore
       }
 
-      setSession(res.token, {
+      setSession(res.token, res.refreshToken, {
         id: res.id,
         username: values.username,
         roles: [role as "ADMIN" | "CUSTOMER"],

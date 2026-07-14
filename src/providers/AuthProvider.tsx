@@ -18,7 +18,7 @@ type AuthContextValue = {
   status: AuthStatus;
   user: AuthUser | null;
   token: string | null;
-  setSession: (token: string, user?: AuthUser | null) => void;
+  setSession: (token: string, refreshToken?: string, user?: AuthUser | null) => void;
   signOut: () => void;
   hasRole: (role: Role) => boolean;
 };
@@ -90,8 +90,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const setSession = useCallback((newToken: string, newUser?: AuthUser | null) => {
+  const setSession = useCallback((newToken: string, newRefreshToken?: string, newUser?: AuthUser | null) => {
     tokenStore.set(newToken);
+    if (newRefreshToken) tokenStore.setRefresh(newRefreshToken);
     const resolved = newUser ?? userFromToken(newToken);
     writeStoredUser(resolved);
     setToken(newToken);

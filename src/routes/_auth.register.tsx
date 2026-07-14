@@ -57,7 +57,7 @@ function RegisterPage() {
         username: values.username,
         password: values.password,
       });
-      setSession(login.token, {
+      setSession(login.token, login.refreshToken, {
         id: login.id,
         username: values.username,
         email: values.email,

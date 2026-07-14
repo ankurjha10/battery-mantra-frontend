@@ -5,6 +5,18 @@ import { ApiError, parseApiError } from "./errors";
 
 const DEFAULT_TIMEOUT = 30_000;
 
+let isRefreshing = false;
+let refreshSubscribers: ((token: string) => void)[] = [];
+
+function onRefreshed(token: string) {
+  refreshSubscribers.forEach((cb) => cb(token));
+  refreshSubscribers = [];
+}
+
+function addRefreshSubscriber(cb: (token: string) => void) {
+  refreshSubscribers.push(cb);
+}
+
 function buildUrl(path: string, query?: RequestOptions["query"]): string {
   const base = env.API_BASE_URL.replace(/\/$/, "");
   const p = path.startsWith("/") ? path : `/${path}`;
@@ -84,6 +96,89 @@ export async function apiFetch<T = unknown>(path: string, opts: RequestOptions =
   const data: unknown = isJson ? await res.json().catch(() => null) : await res.text().catch(() => null);
 
   if (!res.ok) {
+    if (auth && (res.status === 401 || res.status === 403) && isBrowser) {
+      const refreshToken = tokenStore.getRefresh();
+      
+      if (refreshToken) {
+        if (!isRefreshing) {
+          isRefreshing = true;
+          try {
+            const base = env.API_BASE_URL.replace(/\/$/, "");
+            const refreshRes = await fetch(`${base}/api/auth/refresh`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ refreshToken }),
+            });
+            
+            if (refreshRes.ok) {
+              const refreshData = await refreshRes.json();
+              tokenStore.set(refreshData.token);
+              if (refreshData.refreshToken) {
+                tokenStore.setRefresh(refreshData.refreshToken);
+              }
+              onRefreshed(refreshData.token);
+              
+              // Retry original request
+              finalHeaders.Authorization = `Bearer ${refreshData.token}`;
+              const retryRes = await fetch(buildUrl(path, query), {
+                method,
+                headers: finalHeaders,
+                body: payload,
+                signal: controller.signal,
+                credentials: "omit",
+              });
+              const retryContentType = retryRes.headers.get("content-type") ?? "";
+              const retryData: unknown = retryContentType.includes("application/json") 
+                ? await retryRes.json().catch(() => null) 
+                : await retryRes.text().catch(() => null);
+              
+              if (!retryRes.ok) throw parseApiError(retryRes.status, retryData);
+              return retryData as T;
+            } else {
+              throw new Error("Refresh failed");
+            }
+          } catch (err) {
+            tokenStore.clear();
+            onRefreshed(""); // Flush queue, they will fail
+            if (!window.location.pathname.includes("/auth/login")) {
+              window.location.href = "/auth/login";
+            }
+            throw parseApiError(res.status, data);
+          } finally {
+            isRefreshing = false;
+          }
+        } else {
+          return new Promise<T>((resolve, reject) => {
+            addRefreshSubscriber((newToken) => {
+              if (!newToken) {
+                reject(parseApiError(res.status, data));
+                return;
+              }
+              finalHeaders.Authorization = `Bearer ${newToken}`;
+              fetch(buildUrl(path, query), {
+                method,
+                headers: finalHeaders,
+                body: payload,
+                signal: controller.signal,
+                credentials: "omit",
+              }).then(async retryRes => {
+                const retryContentType = retryRes.headers.get("content-type") ?? "";
+                const retryData: unknown = retryContentType.includes("application/json") 
+                  ? await retryRes.json().catch(() => null) 
+                  : await retryRes.text().catch(() => null);
+                if (!retryRes.ok) reject(parseApiError(retryRes.status, retryData));
+                else resolve(retryData as T);
+              }).catch(err => reject(new ApiError("Network error", { status: 0, code: "NETWORK", raw: err })));
+            });
+          });
+        }
+      } else {
+        tokenStore.clear();
+        if (!window.location.pathname.includes("/auth/login")) {
+          window.location.href = "/auth/login";
+        }
+      }
+    }
     throw parseApiError(res.status, data);
   }
   return data as T;
