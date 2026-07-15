@@ -51,10 +51,11 @@ export const LocationModal = ({ isOpen, onClose }: LocationModalProps) => {
   };
 
   const handleCitySelect = (city: any) => {
-    // If user selects a city manually without a pincode, we might not have a specific pincode.
-    // However, the backend checkPincode needs a pincode.
-    // For now, just set the city and let them know they should enter a pincode for exact check.
-    toast.info(`You selected ${city.cityName}. Please enter your pincode for exact delivery check.`);
+    // If they click a popular city, we set it as their location without a specific pincode.
+    // Since it's a registered city, we know delivery is available there.
+    setLocation("", true, city);
+    toast.success(`Location set to ${city.cityName}!`);
+    onClose();
   };
 
   return (
