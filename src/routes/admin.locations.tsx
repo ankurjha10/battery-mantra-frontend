@@ -184,7 +184,8 @@ function AdminLocations() {
 
   const handleAddPincodes = () => {
     if (!pincodeInput.trim()) return;
-    const codes = pincodeInput.split(",").map(c => c.trim()).filter(Boolean);
+    const rawCodes = pincodeInput.split(",").map(c => c.trim()).filter(Boolean);
+    const codes = Array.from(new Set(rawCodes));
     if (codes.length > 0) {
       addPincodeMutation.mutate(codes);
     }
