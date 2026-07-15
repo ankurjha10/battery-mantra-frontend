@@ -33,6 +33,8 @@ import { useAuth } from "@/providers/AuthProvider";
 import { cartService } from "@/services/cart.service";
 import { toast } from "sonner";
 import { useNavigate } from "@tanstack/react-router";
+import { useLocationStore } from "@/store/useLocationStore";
+import { AlertCircle } from "lucide-react";
 
 const searchSchema = z.object({
   autoAdd: z.enum(["true", "false"]).optional().catch(undefined),
@@ -88,6 +90,10 @@ function PdpPage() {
   
   const [activeImage, setActiveImage] = useState<string | null>(null);
 
+  const { isServiceable, pincode, city } = useLocationStore();
+  const locationChecked = Boolean(pincode || city);
+  const blockPurchase = locationChecked && !isServiceable;
+
   useEffect(() => {
     if (data?.productImage && !activeImage) {
       setActiveImage(data.productImage);
@@ -125,6 +131,7 @@ function PdpPage() {
   }, [status, search.autoAdd, search.autoBuy, inStock]);
 
   const onAdd = () => {
+    if (blockPurchase) return;
     if (status !== "authenticated") {
       toast.info("Please sign in to add items to your cart.");
       navigate({ to: "/login", search: { redirect: `/products/${id}?autoAdd=true` } });
@@ -134,6 +141,7 @@ function PdpPage() {
   };
 
   const onBuyNow = () => {
+    if (blockPurchase) return;
     if (status !== "authenticated") {
       navigate({ to: "/login", search: { redirect: `/products/${id}?autoBuy=true` } });
       return;
@@ -357,7 +365,7 @@ function PdpPage() {
                     onChange={setQty}
                     min={1}
                     max={Math.max(1, data.productStock ?? 10)}
-                    disabled={!inStock}
+                    disabled={!inStock || blockPurchase}
                   />
                 </div>
                 
@@ -367,7 +375,7 @@ function PdpPage() {
                     size="lg"
                     className="flex-1 h-14 text-base font-semibold border-2 hover:bg-brand/5"
                     onClick={onAdd}
-                    disabled={!inStock || addToCart.isPending}
+                    disabled={!inStock || addToCart.isPending || blockPurchase}
                   >
                     <ShoppingCart className="h-5 w-5 mr-2" />
                     Add to Cart
@@ -377,13 +385,25 @@ function PdpPage() {
                     size="lg"
                     className="flex-1 h-14 text-base font-semibold shadow-lg shadow-brand/20 hover:shadow-xl hover:shadow-brand/30 transition-all"
                     onClick={onBuyNow}
-                    disabled={!inStock || addToCart.isPending}
+                    disabled={!inStock || addToCart.isPending || blockPurchase}
                   >
                     <Zap className="h-5 w-5 mr-2" />
                     Buy Now
                   </Button>
                 </div>
               </div>
+
+              {blockPurchase && (
+                <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3 text-red-700">
+                  <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="font-semibold text-sm">Delivery Not Available</h4>
+                    <p className="text-xs mt-1 opacity-90">
+                      Sorry, we currently do not deliver to {pincode || city?.cityName}. Please change your location to purchase.
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
