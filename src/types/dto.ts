@@ -347,6 +347,6 @@ export interface AddPincodeRequest {
 }
 
 export interface PincodeCheckResponse {
-  isServiceable: boolean;
+  serviceable: boolean;
   city: CityDto | null;
 }

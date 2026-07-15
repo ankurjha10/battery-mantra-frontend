@@ -33,9 +33,9 @@ export const useGeolocation = () => {
           // Check if pincode is serviceable
           const result = await locationService.checkPincode(postcode);
           
-          setLocation(postcode, result.isServiceable, result.city);
+          setLocation(postcode, result.serviceable, result.city);
           
-          if (result.isServiceable) {
+          if (result.serviceable) {
             toast.success(`Location set to ${result.city?.cityName}, ${postcode}`);
           } else {
             toast.error(`Sorry, we do not deliver to ${postcode} yet.`);

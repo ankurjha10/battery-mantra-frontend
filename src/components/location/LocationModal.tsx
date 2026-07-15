@@ -35,9 +35,9 @@ export const LocationModal = ({ isOpen, onClose }: LocationModalProps) => {
     setIsChecking(true);
     try {
       const result = await locationService.checkPincode(code);
-      setLocation(code, result.isServiceable, result.city);
+      setLocation(code, result.serviceable, result.city);
       
-      if (result.isServiceable) {
+      if (result.serviceable) {
         toast.success(`Delivery available in ${result.city?.cityName}!`);
         onClose();
       } else {
@@ -59,22 +59,24 @@ export const LocationModal = ({ isOpen, onClose }: LocationModalProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md bg-white/70 backdrop-blur-xl border-white/20 shadow-2xl">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold flex items-center gap-2">
-            <MapPin className="text-primary h-6 w-6" />
-            Select Your Location
-          </DialogTitle>
-          <p className="text-sm text-gray-500">
-            To see accurate pricing and delivery options, please set your location.
-          </p>
-        </DialogHeader>
+      <DialogContent className="sm:max-w-md bg-white border border-gray-100 shadow-2xl rounded-2xl overflow-hidden p-0">
+        <div className="p-6 bg-gradient-to-b from-primary/5 to-transparent border-b border-gray-50">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold flex items-center gap-2 text-gray-900">
+              <MapPin className="text-primary h-6 w-6" />
+              Select Your Location
+            </DialogTitle>
+            <p className="text-sm text-gray-500 mt-1">
+              To see accurate pricing and delivery options, please set your location.
+            </p>
+          </DialogHeader>
+        </div>
 
-        <div className="space-y-6 py-4">
+        <div className="space-y-6 px-6 pb-6 pt-4">
           {/* Detect Location Button */}
           <Button 
-            variant="outline" 
-            className="w-full h-12 text-lg font-medium border-primary/20 hover:bg-primary/5 hover:text-primary transition-all duration-300"
+            variant="default" 
+            className="w-full h-12 text-lg font-semibold bg-primary hover:bg-primary/90 text-white shadow-md shadow-primary/20 transition-all duration-300"
             onClick={() => {
               detectLocation().then(() => {
                 // We don't automatically close here unless we want to, wait for state to update.
@@ -94,8 +96,8 @@ export const LocationModal = ({ isOpen, onClose }: LocationModalProps) => {
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t border-gray-200" />
             </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white/70 backdrop-blur-xl px-2 text-gray-500">
+            <div className="relative flex justify-center text-xs uppercase font-medium">
+              <span className="bg-white px-3 text-gray-400">
                 Or enter pincode
               </span>
             </div>
@@ -107,7 +109,7 @@ export const LocationModal = ({ isOpen, onClose }: LocationModalProps) => {
               placeholder="Enter 6-digit Pincode" 
               value={pincodeInput}
               onChange={(e) => setPincodeInput(e.target.value.replace(/\D/g, "").slice(0, 6))}
-              className="h-12 text-lg text-center tracking-widest bg-white/50"
+              className="h-12 text-lg text-center tracking-widest bg-gray-50 border-gray-200 focus-visible:ring-primary/50 focus-visible:border-primary shadow-inner"
               maxLength={6}
             />
             <Button 
