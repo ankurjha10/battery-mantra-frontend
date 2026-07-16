@@ -7,6 +7,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { rootCategoriesQuery, brandsQuery, vehiclesListQuery, productDetailQuery, productListQuery } from "@/queries";
 import { adminService } from "@/services/admin.service";
 import { locationService } from "@/services/location.service";
+import { ALL_CAPACITIES } from "@/constants/capacities";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -266,7 +267,17 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
               </div>
               <div className="space-y-2">
                 <Label htmlFor="capacity">Capacity</Label>
-                <Input id="capacity" placeholder="e.g. 100Ah" {...form.register("capacity")} />
+                <Select value={form.watch("capacity") || "none"} onValueChange={(val) => form.setValue("capacity", val === "none" ? "" : val, { shouldDirty: true, shouldValidate: true })}>
+                  <SelectTrigger className={form.formState.errors.capacity ? "border-red-500" : ""}>
+                    <SelectValue placeholder="Select a capacity (Optional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">None (Clear)</SelectItem>
+                    {ALL_CAPACITIES.map((cap) => (
+                      <SelectItem key={cap} value={cap}>{cap}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="productDescription">Description</Label>

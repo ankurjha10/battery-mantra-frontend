@@ -7,6 +7,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { rootCategoriesQuery, brandsQuery, vehiclesListQuery, productListQuery } from "@/queries";
 import { adminService } from "@/services/admin.service";
 import { locationService } from "@/services/location.service";
+import { ALL_CAPACITIES } from "@/constants/capacities";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -283,8 +284,18 @@ function AddProductPage() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="capacity">Capacity Code</Label>
-                <Input id="capacity" placeholder="e.g. 38L, DIN-55L" {...form.register("capacity")} />
-                <p className="text-xs text-muted-foreground">Type the exact capacity code. Vehicles matching this code will automatically be listed as compatible.</p>
+                <Select onValueChange={(val) => form.setValue("capacity", val === "none" ? "" : val, { shouldValidate: true })}>
+                  <SelectTrigger className={form.formState.errors.capacity ? "border-red-500" : ""}>
+                    <SelectValue placeholder="Select a capacity (Optional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">None (Leave Blank)</SelectItem>
+                    {ALL_CAPACITIES.map((cap) => (
+                      <SelectItem key={cap} value={cap}>{cap}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">Select the exact capacity code. Vehicles matching this code will automatically be listed as compatible.</p>
               </div>
             </CardContent>
           </Card>
