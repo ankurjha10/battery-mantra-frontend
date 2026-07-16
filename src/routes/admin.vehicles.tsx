@@ -14,6 +14,10 @@ import { Trash2, Plus, Edit, Car, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FormField } from "@/components/forms/FormField";
+import { ALL_CAPACITIES, CAR_CAPACITIES, TWO_WHEELER_CAPACITIES, GENERATOR_CAPACITIES } from "@/constants/capacities";
+import { Badge } from "@/components/ui/badge";
+import { X } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -466,8 +470,65 @@ function AdminVehicles() {
             </FormField>
 
             <FormField label="Capacity (RL)" htmlFor="capacity" error={form.formState.errors.capacity?.message}>
-              <Input id="capacity" {...form.register("capacity")} placeholder="e.g. 38L,40L,DIN-55L" />
-              <p className="text-[10px] text-muted-foreground mt-1">Comma-separated capacity codes for automatic battery matching.</p>
+              <div className="space-y-3">
+                <div className="flex flex-wrap gap-2 min-h-[28px] p-2 border rounded-md bg-muted/20">
+                  {(() => {
+                    const currentCapacities = form.watch("capacity") ? form.watch("capacity").split(",").map((c: string) => c.trim()).filter(Boolean) : [];
+                    return (
+                      <>
+                        {currentCapacities.map((cap: string) => (
+                          <Badge key={cap} variant="secondary" className="px-2 py-1 flex items-center gap-1 font-normal bg-background border shadow-sm">
+                            {cap}
+                            <X 
+                              className="h-3 w-3 cursor-pointer hover:text-destructive transition-colors" 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const newCaps = currentCapacities.filter((c: string) => c !== cap);
+                                form.setValue("capacity", newCaps.join(","), { shouldDirty: true });
+                              }} 
+                            />
+                          </Badge>
+                        ))}
+                        {currentCapacities.length === 0 && (
+                          <span className="text-xs text-muted-foreground my-auto ml-1">No capacities added</span>
+                        )}
+                      </>
+                    );
+                  })()}
+                </div>
+                
+                <Select 
+                  key={(() => {
+                    const currentCapacities = form.watch("capacity") ? form.watch("capacity").split(",").map((c: string) => c.trim()).filter(Boolean) : [];
+                    return currentCapacities.length;
+                  })()}
+                  onValueChange={(val) => {
+                    if (!val) return;
+                    const currentCapacities = form.watch("capacity") ? form.watch("capacity").split(",").map((c: string) => c.trim()).filter(Boolean) : [];
+                    if (!currentCapacities.includes(val)) {
+                      form.setValue("capacity", [...currentCapacities, val].join(","), { shouldDirty: true });
+                    }
+                  }}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Add a capacity..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(() => {
+                      const vType = form.watch("vehicleType");
+                      let options = ALL_CAPACITIES;
+                      if (vType === "CAR") options = CAR_CAPACITIES;
+                      else if (vType === "BIKE") options = TWO_WHEELER_CAPACITIES;
+                      else if (vType === "GENERATOR") options = GENERATOR_CAPACITIES;
+                      
+                      return options.map((cap) => (
+                        <SelectItem key={cap} value={cap}>{cap}</SelectItem>
+                      ));
+                    })()}
+                  </SelectContent>
+                </Select>
+              </div>
+              <p className="text-[10px] text-muted-foreground mt-1.5 leading-relaxed">Add one or more capacity codes for this vehicle to automatically match compatible batteries.</p>
             </FormField>
 
             <FormField label="Image URL" htmlFor="imageUrl" error={form.formState.errors.imageUrl?.message}>
