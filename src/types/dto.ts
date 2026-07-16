@@ -261,7 +261,7 @@ export type CreateProductRequest = {
   categoryId?: UUID;
   brandId?: UUID;
   specs?: Record<string, unknown>;
-  compatibleVehicleIds?: UUID[];
+  capacity?: string;
   cityPrices?: CityPricingDto[];
 };
 

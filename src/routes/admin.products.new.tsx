@@ -32,7 +32,7 @@ const formSchema = z.object({
   })).default([]),
   categoryId: z.string().uuid("Category is required"),
   brandId: z.string().uuid("Brand is required"),
-  compatibleVehicleIds: z.array(z.string().uuid()).default([]),
+  capacity: z.string().optional(),
   specs: z.array(z.object({
     groupName: z.string().min(1, "Group name is required"),
     items: z.array(z.object({
@@ -58,7 +58,6 @@ function AddProductPage() {
   const navigate = useNavigate();
   const { data: rootCategories = [] } = useQuery(rootCategoriesQuery());
   const { data: brands = [] } = useQuery(brandsQuery());
-  const { data: vehicles = [] } = useQuery(vehiclesListQuery());
   const { data: cities = [] } = useQuery({ queryKey: ["admin", "cities"], queryFn: () => locationService.getAllCities() });
   const queryClient = useQueryClient();
 
@@ -78,7 +77,7 @@ function AddProductPage() {
       productStock: 0,
       productImage: "",
       additionalImages: [],
-      compatibleVehicleIds: [],
+      capacity: "",
       specs: [],
       cityPrices: [],
     }
@@ -159,7 +158,7 @@ function AddProductPage() {
       additionalImages: data.additionalImages.length > 0 ? data.additionalImages.map(img => img.url).filter(Boolean) : undefined,
       categoryId: data.categoryId,
       brandId: data.brandId,
-      compatibleVehicleIds: applicable ? data.compatibleVehicleIds : [],
+      capacity: data.capacity || undefined,
       specs: Object.keys(specsRecord).length > 0 ? specsRecord : undefined,
       cityPrices: data.cityPrices.length > 0 ? data.cityPrices : undefined
     };
@@ -168,21 +167,6 @@ function AddProductPage() {
   };
 
   const watchImageUrl = form.watch("productImage");
-  const watchVehicles = form.watch("compatibleVehicleIds");
-
-  const toggleVehicle = (id: string) => {
-    const current = watchVehicles || [];
-    if (current.includes(id)) {
-      form.setValue("compatibleVehicleIds", current.filter(vId => vId !== id));
-    } else {
-      form.setValue("compatibleVehicleIds", [...current, id]);
-    }
-  };
-
-  const selectedRootCategory = rootCategories.find(c => c.categoryId === selectedRootId);
-  const isVehicleApplicable = selectedRootCategory 
-    ? !/inverter|stabilizer|ups|solar/i.test(selectedRootCategory.categoryName) 
-    : true;
 
   return (
     <div className="mx-auto max-w-5xl space-y-6 pb-20">
@@ -286,6 +270,22 @@ function AddProductPage() {
                   })}
                 </div>
               )}
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-sm">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Capacity (RL)</CardTitle>
+                <CardDescription>Enter the capacity to automatically match vehicles.</CardDescription>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="capacity">Capacity Code</Label>
+                <Input id="capacity" placeholder="e.g. 38L, DIN-55L" {...form.register("capacity")} />
+                <p className="text-xs text-muted-foreground">Type the exact capacity code. Vehicles matching this code will automatically be listed as compatible.</p>
+              </div>
             </CardContent>
           </Card>
 
@@ -469,61 +469,6 @@ function AddProductPage() {
               </div>
             </CardContent>
           </Card>
-
-          {isVehicleApplicable && (
-            <Card className="shadow-sm">
-              <CardHeader>
-                <CardTitle>Compatibility</CardTitle>
-                <CardDescription>Select vehicles this battery fits.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Tabs defaultValue="CAR" className="w-full">
-                <TabsList className="mb-4 flex-wrap h-auto gap-1 bg-muted/50 p-1 w-full justify-start">
-                  {Object.keys(
-                    vehicles.reduce((acc, v) => {
-                      const type = v.vehicleType || "CAR";
-                      if (!acc[type]) acc[type] = [];
-                      acc[type].push(v);
-                      return acc;
-                    }, {} as Record<string, typeof vehicles>)
-                  ).map(type => (
-                    <TabsTrigger key={type} value={type} className="rounded-md text-xs px-3">{type}</TabsTrigger>
-                  ))}
-                </TabsList>
-
-                {Object.entries(
-                  vehicles.reduce((acc, v) => {
-                    const type = v.vehicleType || "CAR";
-                    if (!acc[type]) acc[type] = [];
-                    acc[type].push(v);
-                    return acc;
-                  }, {} as Record<string, typeof vehicles>)
-                ).map(([type, typeVehicles]) => (
-                  <TabsContent key={type} value={type} className="mt-0">
-                    <div className="max-h-[250px] overflow-y-auto space-y-3 pr-2 custom-scrollbar">
-                      {typeVehicles.map((v) => (
-                        <div key={v.vehicleId} className="flex items-center space-x-2">
-                          <Checkbox 
-                            id={`vehicle-${v.vehicleId}`} 
-                            checked={(watchVehicles || []).includes(v.vehicleId)}
-                            onCheckedChange={() => toggleVehicle(v.vehicleId)}
-                          />
-                          <label htmlFor={`vehicle-${v.vehicleId}`} className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer">
-                            {v.make} {v.model}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </TabsContent>
-                ))}
-                {vehicles.length === 0 && (
-                  <p className="text-sm text-muted-foreground text-center py-4">No vehicles available.</p>
-                )}
-              </Tabs>
-            </CardContent>
-          </Card>
-          )}
-
         </div>
       </form>
 

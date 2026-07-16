@@ -51,6 +51,7 @@ const vehicleSchema = z.object({
   model: z.string().trim().min(1, "Model is required"),
   fuelType: z.enum(["PETROL", "DIESEL", "ELECTRIC", "CNG"]).optional(),
   imageUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  capacity: z.string().optional(),
 });
 
 type VehicleFormValues = z.infer<typeof vehicleSchema>;
@@ -83,6 +84,7 @@ const parseCSV = (text: string) => {
       model: row.model,
       fuelType: ["PETROL", "DIESEL", "ELECTRIC", "CNG"].includes(fuelType) ? fuelType : undefined,
       imageUrl: row.imageUrl || undefined,
+      capacity: row.capacity || undefined,
     });
   }
   return results;
@@ -135,6 +137,7 @@ function AdminVehicles() {
       model: "",
       fuelType: undefined,
       imageUrl: "",
+      capacity: "",
     });
     setIsModalOpen(true);
   };
@@ -147,6 +150,7 @@ function AdminVehicles() {
       model: vehicle.model,
       fuelType: vehicle.fuelType,
       imageUrl: vehicle.imageUrl || "",
+      capacity: vehicle.capacity || "",
     });
     setIsModalOpen(true);
   };
@@ -193,6 +197,7 @@ function AdminVehicles() {
       model: values.model,
       fuelType: values.fuelType,
       imageUrl: values.imageUrl || undefined,
+      capacity: values.capacity || undefined,
     };
 
     if (editingVehicle) {
@@ -307,19 +312,20 @@ function AdminVehicles() {
                 <TableHead>Make</TableHead>
                 <TableHead>Model</TableHead>
                 <TableHead>Fuel Type</TableHead>
+                <TableHead>Capacity</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center">
+                  <TableCell colSpan={7} className="h-24 text-center">
                     <Spinner size="sm" className="inline-block mr-2" /> Loading vehicles...
                   </TableCell>
                 </TableRow>
               ) : !filteredVehicles?.length ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
+                  <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
                     No vehicles found in this category.
                   </TableCell>
                 </TableRow>
@@ -345,6 +351,7 @@ function AdminVehicles() {
                     <TableCell className="font-medium">{vehicle.make}</TableCell>
                     <TableCell>{vehicle.model}</TableCell>
                     <TableCell>{vehicle.fuelType || "Any"}</TableCell>
+                    <TableCell>{vehicle.capacity || "-"}</TableCell>
                     <TableCell className="text-right">
                       <Button variant="ghost" size="icon" onClick={() => openEditModal(vehicle)}>
                         <Edit className="h-4 w-4" />
@@ -458,6 +465,11 @@ function AdminVehicles() {
               </select>
             </FormField>
 
+            <FormField label="Capacity (RL)" htmlFor="capacity" error={form.formState.errors.capacity?.message}>
+              <Input id="capacity" {...form.register("capacity")} placeholder="e.g. 38L,40L,DIN-55L" />
+              <p className="text-[10px] text-muted-foreground mt-1">Comma-separated capacity codes for automatic battery matching.</p>
+            </FormField>
+
             <FormField label="Image URL" htmlFor="imageUrl" error={form.formState.errors.imageUrl?.message}>
               <Input id="imageUrl" type="url" {...form.register("imageUrl")} placeholder="https://example.com/car.png" />
             </FormField>
@@ -487,13 +499,13 @@ function AdminVehicles() {
               <p className="text-muted-foreground leading-relaxed">
                 The CSV file must contain a header row with the following column names (exact case):
                 <code className="block mt-1 bg-background p-1.5 rounded border border-border font-mono text-[11px] text-foreground">
-                  vehicleType,make,model,fuelType,imageUrl
+                  vehicleType,make,model,fuelType,imageUrl,capacity
                 </code>
               </p>
               <ul className="list-disc list-inside space-y-1 text-muted-foreground">
                 <li><strong className="text-foreground">vehicleType:</strong> CAR, BIKE, COMMERCIAL, E_RICKSHAW, INVERTER</li>
                 <li><strong className="text-foreground">fuelType:</strong> PETROL, DIESEL, ELECTRIC, CNG (or leave blank)</li>
-                <li><strong className="text-foreground">imageUrl:</strong> Valid image URL (or leave blank)</li>
+                <li><strong className="text-foreground">imageUrl/capacity:</strong> Optional (or leave blank)</li>
               </ul>
             </div>
 

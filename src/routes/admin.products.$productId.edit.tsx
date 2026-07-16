@@ -32,7 +32,7 @@ const formSchema = z.object({
   })).default([]),
   categoryId: z.string().uuid("Category is required"),
   brandId: z.string().uuid("Brand is required"),
-  compatibleVehicleIds: z.array(z.string().uuid()).default([]),
+  capacity: z.string().optional(),
   specs: z.array(z.object({
     groupName: z.string().min(1, "Group name is required"),
     items: z.array(z.object({
@@ -86,7 +86,7 @@ function EditProductPage() {
     additionalImages: product.additionalImages?.map(url => ({ url })) || [],
     categoryId: product.categoryId || "",
     brandId: product.brandId || "",
-    compatibleVehicleIds: product.compatibleVehicles?.map(v => v.vehicleId) || [],
+    capacity: product.capacity || "",
     specs: product.specs
       ? (() => {
           const entries = Object.entries(product.specs);
@@ -124,7 +124,6 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
   const navigate = useNavigate();
   const { data: rootCategories = [] } = useQuery(rootCategoriesQuery());
   const { data: brands = [] } = useQuery(brandsQuery());
-  const { data: vehicles = [] } = useQuery(vehiclesListQuery());
   const { data: cities = [] } = useQuery({ queryKey: ["admin", "cities"], queryFn: () => locationService.getAllCities() });
   const queryClient = useQueryClient();
 
@@ -146,9 +145,6 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
   }, [initialRootId, selectedRootId]);
 
   const selectedRootCategory = rootCategories.find(c => c.categoryId === selectedRootId);
-  const isVehicleApplicable = selectedRootCategory 
-    ? !/inverter|stabilizer|ups|solar/i.test(selectedRootCategory.categoryName) 
-    : true;
   
   const subCategories = selectedRootCategory?.subCategories || [];
 
@@ -219,9 +215,6 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
       specsRecord["originalPrice"] = data.originalPrice.toString() as any;
     }
 
-    const rootCat = rootCategories?.find(c => c.categoryId === data.categoryId);
-    const applicable = rootCat ? !/inverter|stabilizer|ups|solar/i.test(rootCat.categoryName) : true;
-
     const payload = {
       productName: data.productName,
       productDescription: data.productDescription || undefined,
@@ -232,7 +225,7 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
       additionalImages: data.additionalImages.length > 0 ? data.additionalImages.map(img => img.url).filter(Boolean) : undefined,
       categoryId: data.categoryId,
       brandId: data.brandId,
-      compatibleVehicleIds: applicable ? data.compatibleVehicleIds : [],
+      capacity: data.capacity || undefined,
       specs: Object.keys(specsRecord).length > 0 ? specsRecord : undefined,
       cityPrices: data.cityPrices.length > 0 ? data.cityPrices : undefined
     };
@@ -241,16 +234,6 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
   };
 
   const watchImageUrl = form.watch("productImage");
-  const watchVehicles = form.watch("compatibleVehicleIds");
-
-  const toggleVehicle = (id: string) => {
-    const current = watchVehicles || [];
-    if (current.includes(id)) {
-      form.setValue("compatibleVehicleIds", current.filter(vId => vId !== id), { shouldDirty: true });
-    } else {
-      form.setValue("compatibleVehicleIds", [...current, id], { shouldDirty: true });
-    }
-  };
 
   return (
     <div className="mx-auto max-w-5xl space-y-6 pb-20">
@@ -280,6 +263,10 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
                 <Label htmlFor="productName">Product Name <span className="text-red-500">*</span></Label>
                 <Input id="productName" placeholder="e.g. Amaron Pro 12V 45Ah" {...form.register("productName")} />
                 {form.formState.errors.productName && <p className="text-xs text-red-500">{form.formState.errors.productName.message}</p>}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="capacity">Capacity</Label>
+                <Input id="capacity" placeholder="e.g. 100Ah" {...form.register("capacity")} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="productDescription">Description</Label>
@@ -537,60 +524,6 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
               </div>
             </CardContent>
           </Card>
-
-          {isVehicleApplicable && (
-            <Card className="shadow-sm">
-              <CardHeader>
-                <CardTitle>Compatibility</CardTitle>
-              <CardDescription>Select vehicles this battery fits.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Tabs defaultValue="CAR" className="w-full">
-                <TabsList className="mb-4 flex-wrap h-auto gap-1 bg-muted/50 p-1 w-full justify-start">
-                  {Object.keys(
-                    vehicles.reduce((acc, v) => {
-                      const type = v.vehicleType || "CAR";
-                      if (!acc[type]) acc[type] = [];
-                      acc[type].push(v);
-                      return acc;
-                    }, {} as Record<string, typeof vehicles>)
-                  ).map(type => (
-                    <TabsTrigger key={type} value={type} className="rounded-md text-xs px-3">{type}</TabsTrigger>
-                  ))}
-                </TabsList>
-
-                {Object.entries(
-                  vehicles.reduce((acc, v) => {
-                    const type = v.vehicleType || "CAR";
-                    if (!acc[type]) acc[type] = [];
-                    acc[type].push(v);
-                    return acc;
-                  }, {} as Record<string, typeof vehicles>)
-                ).map(([type, typeVehicles]) => (
-                  <TabsContent key={type} value={type} className="mt-0">
-                    <div className="max-h-[250px] overflow-y-auto space-y-3 pr-2 custom-scrollbar">
-                      {typeVehicles.map((v) => (
-                        <div key={v.vehicleId} className="flex items-center space-x-2">
-                          <Checkbox 
-                            id={`vehicle-${v.vehicleId}`} 
-                            checked={(watchVehicles || []).includes(v.vehicleId)}
-                            onCheckedChange={() => toggleVehicle(v.vehicleId)}
-                          />
-                          <label htmlFor={`vehicle-${v.vehicleId}`} className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer">
-                            {v.make} {v.model}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </TabsContent>
-                ))}
-                {vehicles.length === 0 && (
-                  <p className="text-sm text-muted-foreground text-center py-4">No vehicles available.</p>
-                )}
-              </Tabs>
-            </CardContent>
-          </Card>
-          )}
         </div>
       </form>
 
