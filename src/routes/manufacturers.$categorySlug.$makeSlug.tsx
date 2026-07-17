@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Container } from "@/components/layout/Container";
 import { vehiclesListQuery, vehiclesSearchQuery, manufacturersListQuery } from "@/queries";
 import { ChevronRight } from "lucide-react";
+import { SeoCityLinks } from "@/components/products/SeoCityLinks";
 
 // Helper to format string to slug
 const toSlug = (text: string) => text.toLowerCase().replace(/\s+/g, '-');
@@ -108,6 +109,8 @@ function ManufacturerPage() {
           )}
         </div>
       )}
+
+      <SeoCityLinks productName={`${manufacturer?.name || exactMake} ${categoryName}`} />
     </Container>
   );
 }

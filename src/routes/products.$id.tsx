@@ -7,6 +7,7 @@ import { Container } from "@/components/layout/Container";
 import { ProductGallery } from "@/components/products/ProductGallery";
 import { SpecificationsTable, flattenSpecs } from "@/components/products/SpecificationsTable";
 import { ProductCard } from "@/components/products/ProductCard";
+import { SeoCityLinks } from "@/components/products/SeoCityLinks";
 import { Price } from "@/components/common/Price";
 import { QuantityStepper } from "@/components/common/QuantityStepper";
 import { Button } from "@/components/ui/button";
@@ -520,6 +521,9 @@ function PdpPage() {
       </Container>
       
       <RelatedProducts currentProductId={id} currentProduct={data} />
+      <Container size="xl" className="pb-8">
+        <SeoCityLinks productName={data.productName} />
+      </Container>
     </div>
   );
 }
