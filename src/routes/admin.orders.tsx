@@ -95,152 +95,248 @@ function AdminOrders() {
   };
 
   const OrderTable = ({ data }: { data: OrderResponse[] }) => (
-    <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
-      <Table>
-        <TableHeader className="bg-muted/50">
-          <TableRow>
-            <TableHead className="w-[250px]">Order Details</TableHead>
-            <TableHead className="w-[200px]">Customer</TableHead>
-            <TableHead>Payment</TableHead>
-            <TableHead>Fulfillment</TableHead>
-            <TableHead>Date & Time</TableHead>
-            <TableHead className="w-[180px]">Status Update</TableHead>
-            <TableHead className="w-[80px]"></TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {isLoading ? (
+    <>
+      {/* Desktop Table */}
+      <div className="hidden md:block rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+        <Table>
+          <TableHeader className="bg-muted/50">
             <TableRow>
-              <TableCell colSpan={7} className="h-32 text-center">
-                <Spinner size="md" className="inline-block" />
-              </TableCell>
+              <TableHead className="w-[250px]">Order Details</TableHead>
+              <TableHead className="w-[200px]">Customer</TableHead>
+              <TableHead>Payment</TableHead>
+              <TableHead>Fulfillment</TableHead>
+              <TableHead>Date & Time</TableHead>
+              <TableHead className="w-[180px]">Status Update</TableHead>
+              <TableHead className="w-[80px]"></TableHead>
             </TableRow>
-          ) : !data.length ? (
-            <TableRow>
-              <TableCell colSpan={7} className="h-32 text-center text-muted-foreground font-medium">
-                No orders found in this category.
-              </TableCell>
-            </TableRow>
-          ) : (
-            data.map((order) => (
-              <TableRow key={order.orderId} className="group relative">
-                <TableCell>
-                  <div className="flex items-start gap-2">
-                    {order.orderStatus === "PENDING" && (
-                      <span className="mt-1.5 flex h-2 w-2 relative">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-                      </span>
-                    )}
-                    <div>
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-mono text-xs font-semibold">#{order.orderId.slice(0, 8)}</span>
-                        <button onClick={() => copyToClipboard(order.orderId)} className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground">
-                          <Copy className="h-3 w-3" />
-                        </button>
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={7} className="h-32 text-center">
+                  <Spinner size="md" className="inline-block" />
+                </TableCell>
+              </TableRow>
+            ) : !data.length ? (
+              <TableRow>
+                <TableCell colSpan={7} className="h-32 text-center text-muted-foreground font-medium">
+                  No orders found in this category.
+                </TableCell>
+              </TableRow>
+            ) : (
+              data.map((order) => (
+                <TableRow key={order.orderId} className="group relative">
+                  <TableCell>
+                    <div className="flex items-start gap-2">
+                      {order.orderStatus === "PENDING" && (
+                        <span className="mt-1.5 flex h-2 w-2 relative">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                        </span>
+                      )}
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-mono text-xs font-semibold">#{order.orderId.slice(0, 8)}</span>
+                          <button onClick={() => copyToClipboard(order.orderId)} className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground">
+                            <Copy className="h-3 w-3" />
+                          </button>
+                        </div>
+                        <p className="mt-1 text-xs text-muted-foreground line-clamp-1">
+                          {order.orderItems.length} item{order.orderItems.length > 1 ? 's' : ''} • ₹{order.totalAmount.toLocaleString()}
+                        </p>
                       </div>
-                      <p className="mt-1 text-xs text-muted-foreground line-clamp-1">
-                        {order.orderItems.length} item{order.orderItems.length > 1 ? 's' : ''} • ₹{order.totalAmount.toLocaleString()}
-                      </p>
                     </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  {order.paymentMethod === "ONLINE" ? (
-                    <span className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-700">ONLINE</span>
-                  ) : (
-                    <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-2.5 py-0.5 text-xs font-semibold text-orange-700">COD</span>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <div className="flex flex-col gap-1.5 text-sm">
-                    {order.customerName && (
-                      <div className="flex items-center gap-1.5 font-medium text-foreground">
-                        <User className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                        <span className="truncate max-w-[150px]">{order.customerName}</span>
-                      </div>
-                    )}
-                    {order.customerPhone && (
-                      <div className="flex items-center gap-1.5 text-muted-foreground">
-                        <Phone className="h-3.5 w-3.5 shrink-0" />
-                        <span>{order.customerPhone}</span>
-                      </div>
-                    )}
-                    {order.customerEmail && (
-                      <div className="flex items-center gap-1.5 text-muted-foreground">
-                        <Mail className="h-3.5 w-3.5 shrink-0" />
-                        <span className="truncate max-w-[150px]" title={order.customerEmail}>{order.customerEmail}</span>
-                      </div>
-                    )}
-                    {!order.customerName && !order.customerPhone && !order.customerEmail && (
-                      <span className="text-muted-foreground text-xs italic">No details available</span>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-start gap-2 text-sm">
-                    {order.deliveryMethod === "HOME_INSTALLATION" ? (
-                      <Wrench className="h-4 w-4 mt-0.5 text-primary shrink-0" />
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-col gap-1.5 text-sm">
+                      {order.customerName && (
+                        <div className="flex items-center gap-1.5 font-medium text-foreground">
+                          <User className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                          <span className="truncate max-w-[150px]">{order.customerName}</span>
+                        </div>
+                      )}
+                      {order.customerPhone && (
+                        <div className="flex items-center gap-1.5 text-muted-foreground">
+                          <Phone className="h-3.5 w-3.5 shrink-0" />
+                          <span>{order.customerPhone}</span>
+                        </div>
+                      )}
+                      {order.customerEmail && (
+                        <div className="flex items-center gap-1.5 text-muted-foreground">
+                          <Mail className="h-3.5 w-3.5 shrink-0" />
+                          <span className="truncate max-w-[150px]" title={order.customerEmail}>{order.customerEmail}</span>
+                        </div>
+                      )}
+                      {!order.customerName && !order.customerPhone && !order.customerEmail && (
+                        <span className="text-muted-foreground text-xs italic">No details available</span>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    {order.paymentMethod === "ONLINE" ? (
+                      <span className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-700">ONLINE</span>
                     ) : (
-                      <Truck className="h-4 w-4 mt-0.5 text-blue-500 shrink-0" />
+                      <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-2.5 py-0.5 text-xs font-semibold text-orange-700">COD</span>
                     )}
-                    <div className="min-w-0">
-                      <p className="font-medium">
-                        {order.deliveryMethod === "HOME_INSTALLATION" ? "Home Installation" : 
-                         order.deliveryMethod === "STORE_PICKUP" ? "Store Pickup" : "Standard Delivery"}
-                      </p>
-                      <div className="flex flex-col gap-1 mt-0.5">
-                        {order.deliveryMethod === "HOME_INSTALLATION" && order.installationDate && (
-                          <div className="flex items-center text-xs text-primary font-medium truncate">
-                            <Calendar className="h-3 w-3 mr-1 shrink-0" />
-                            <span>{new Date(order.installationDate).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}</span>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-start gap-2 text-sm">
+                      {order.deliveryMethod === "HOME_INSTALLATION" ? (
+                        <Wrench className="h-4 w-4 mt-0.5 text-primary shrink-0" />
+                      ) : (
+                        <Truck className="h-4 w-4 mt-0.5 text-blue-500 shrink-0" />
+                      )}
+                      <div className="min-w-0">
+                        <p className="font-medium">
+                          {order.deliveryMethod === "HOME_INSTALLATION" ? "Home Installation" : 
+                           order.deliveryMethod === "STORE_PICKUP" ? "Store Pickup" : "Standard Delivery"}
+                        </p>
+                        <div className="flex flex-col gap-1 mt-0.5">
+                          {order.deliveryMethod === "HOME_INSTALLATION" && order.installationDate && (
+                            <div className="flex items-center text-xs text-primary font-medium truncate">
+                              <Calendar className="h-3 w-3 mr-1 shrink-0" />
+                              <span>{new Date(order.installationDate).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}</span>
+                            </div>
+                          )}
+                          <div className="flex items-center text-xs text-muted-foreground truncate max-w-[200px]">
+                            <MapPin className="h-3 w-3 mr-1 shrink-0" />
+                            <span className="truncate">{order.shippingAddress?.split(',').pop()?.trim() || "No Address"}</span>
                           </div>
-                        )}
-                        <div className="flex items-center text-xs text-muted-foreground truncate max-w-[200px]">
-                          <MapPin className="h-3 w-3 mr-1 shrink-0" />
-                          <span className="truncate">{order.shippingAddress?.split(',').pop()?.trim() || "No Address"}</span>
                         </div>
                       </div>
                     </div>
+                  </TableCell>
+                  <TableCell>
+                    <p className="text-sm font-medium">{formatRelativeTime(order.placedAt)}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {new Date(order.placedAt).toLocaleDateString()}
+                    </p>
+                  </TableCell>
+                  <TableCell>
+                    <Select
+                      defaultValue={order.orderStatus}
+                      onValueChange={(val) => 
+                        updateStatusMutation.mutate({ orderId: order.orderId, status: val as OrderStatus })
+                      }
+                      disabled={updateStatusMutation.isPending}
+                    >
+                      <SelectTrigger className={`h-8 text-xs font-semibold border ${getStatusColor(order.orderStatus)}`}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {ORDER_STATUSES.map((s) => (
+                          <SelectItem key={s} value={s} className="text-xs font-medium">
+                            {s.replace(/_/g, ' ')}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+                  <TableCell>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-muted" onClick={() => setSelectedOrder(order)} aria-label="View Order Details">
+                      <Eye className="h-4 w-4 text-muted-foreground" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Mobile Cards */}
+      <div className="md:hidden space-y-4">
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <Spinner size="md" className="mr-2" />
+          </div>
+        ) : !data.length ? (
+          <div className="text-center py-12 text-muted-foreground font-medium">
+            No orders found.
+          </div>
+        ) : (
+          data.map((order) => (
+            <div key={order.orderId} className="rounded-xl border border-border bg-card shadow-sm p-4 relative overflow-hidden">
+              {order.orderStatus === "PENDING" && (
+                <div className="absolute top-0 left-0 w-1 h-full bg-red-500"></div>
+              )}
+              
+              <div className="flex justify-between items-start mb-3">
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-mono text-sm font-bold text-foreground">#{order.orderId.slice(0, 8)}</span>
+                    <button onClick={() => copyToClipboard(order.orderId)} className="text-muted-foreground p-1 active:scale-95">
+                      <Copy className="h-3.5 w-3.5" />
+                    </button>
                   </div>
-                </TableCell>
-                <TableCell>
-                  <p className="text-sm font-medium">{formatRelativeTime(order.placedAt)}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {new Date(order.placedAt).toLocaleDateString()}
-                  </p>
-                </TableCell>
-                <TableCell>
-                  <Select
-                    defaultValue={order.orderStatus}
-                    onValueChange={(val) => 
-                      updateStatusMutation.mutate({ orderId: order.orderId, status: val as OrderStatus })
-                    }
-                    disabled={updateStatusMutation.isPending}
-                  >
-                    <SelectTrigger className={`h-8 text-xs font-semibold border ${getStatusColor(order.orderStatus)}`}>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {ORDER_STATUSES.map((s) => (
-                        <SelectItem key={s} value={s} className="text-xs font-medium">
-                          {s.replace(/_/g, ' ')}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </TableCell>
-                <TableCell>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-muted" onClick={() => setSelectedOrder(order)} aria-label="View Order Details">
-                    <Eye className="h-4 w-4 text-muted-foreground" />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
-    </div>
+                  <p className="text-xs text-muted-foreground mt-0.5">{formatRelativeTime(order.placedAt)}</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-semibold text-primary">₹{order.totalAmount.toLocaleString()}</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">{order.orderItems.length} item{order.orderItems.length > 1 ? 's' : ''}</p>
+                </div>
+              </div>
+              
+              <div className="space-y-3 mb-4">
+                <div className="flex items-center gap-2 bg-muted/30 p-2 rounded-lg">
+                  <User className="h-4 w-4 text-muted-foreground shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{order.customerName || "No Name"}</p>
+                    <p className="text-xs text-muted-foreground truncate">{order.customerPhone || order.customerEmail || ""}</p>
+                  </div>
+                  {order.paymentMethod === "ONLINE" ? (
+                    <span className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-700 shrink-0">ONLINE</span>
+                  ) : (
+                    <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-2 py-0.5 text-[10px] font-semibold text-orange-700 shrink-0">COD</span>
+                  )}
+                </div>
+                
+                <div className="flex items-center gap-2 px-1">
+                  {order.deliveryMethod === "HOME_INSTALLATION" ? (
+                    <Wrench className="h-4 w-4 text-primary shrink-0" />
+                  ) : (
+                    <Truck className="h-4 w-4 text-blue-500 shrink-0" />
+                  )}
+                  <div className="min-w-0">
+                    <p className="text-sm">
+                      {order.deliveryMethod === "HOME_INSTALLATION" ? "Home Installation" : 
+                       order.deliveryMethod === "STORE_PICKUP" ? "Store Pickup" : "Standard Delivery"}
+                    </p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {order.shippingAddress?.split(',').pop()?.trim() || "No Address"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-2 pt-3 border-t">
+                <Select
+                  defaultValue={order.orderStatus}
+                  onValueChange={(val) => 
+                    updateStatusMutation.mutate({ orderId: order.orderId, status: val as OrderStatus })
+                  }
+                  disabled={updateStatusMutation.isPending}
+                >
+                  <SelectTrigger className={`flex-1 h-9 text-xs font-semibold border ${getStatusColor(order.orderStatus)}`}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ORDER_STATUSES.map((s) => (
+                      <SelectItem key={s} value={s} className="text-xs font-medium">
+                        {s.replace(/_/g, ' ')}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button variant="outline" className="h-9 w-9 p-0 shrink-0 border-border" onClick={() => setSelectedOrder(order)}>
+                  <Eye className="h-4 w-4 text-muted-foreground" />
+                </Button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </>
   );
 
   return (

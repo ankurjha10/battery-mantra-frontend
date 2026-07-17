@@ -247,52 +247,90 @@ function AdminDashboard() {
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          <Table>
-            <TableHeader className="bg-muted/10">
-              <TableRow>
-                <TableHead className="w-[120px] pl-6">Order ID</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Payment</TableHead>
-                <TableHead className="pr-6 text-right">Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {recentOrders.length === 0 ? (
+          {/* Desktop Table */}
+          <div className="hidden sm:block">
+            <Table>
+              <TableHeader className="bg-muted/10">
                 <TableRow>
-                  <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
-                    No orders found.
-                  </TableCell>
+                  <TableHead className="w-[120px] pl-6">Order ID</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Payment</TableHead>
+                  <TableHead className="pr-6 text-right">Status</TableHead>
                 </TableRow>
-              ) : (
-                recentOrders.map((order) => (
-                  <TableRow key={order.orderId}>
-                    <TableCell className="pl-6 font-mono text-xs font-medium">
-                      #{order.orderId.slice(0, 8)}
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {formatTime(order.placedAt)}
-                    </TableCell>
-                    <TableCell className="text-sm font-medium">
-                      ₹{order.totalAmount.toLocaleString()}
-                    </TableCell>
-                    <TableCell>
-                      {order.paymentMethod === "ONLINE" ? (
-                        <span className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-700">ONLINE</span>
-                      ) : (
-                        <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-2 py-0.5 text-xs font-semibold text-orange-700">COD</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="pr-6 text-right">
-                      <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${getStatusColor(order.orderStatus)}`}>
-                        {order.orderStatus.replace(/_/g, ' ')}
-                      </span>
+              </TableHeader>
+              <TableBody>
+                {recentOrders.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+                      No orders found.
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ) : (
+                  recentOrders.map((order) => (
+                    <TableRow key={order.orderId}>
+                      <TableCell className="pl-6 font-mono text-xs font-medium">
+                        #{order.orderId.slice(0, 8)}
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {formatTime(order.placedAt)}
+                      </TableCell>
+                      <TableCell className="text-sm font-medium">
+                        ₹{order.totalAmount.toLocaleString()}
+                      </TableCell>
+                      <TableCell>
+                        {order.paymentMethod === "ONLINE" ? (
+                          <span className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-700">ONLINE</span>
+                        ) : (
+                          <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-2 py-0.5 text-xs font-semibold text-orange-700">COD</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="pr-6 text-right">
+                        <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${getStatusColor(order.orderStatus)}`}>
+                          {order.orderStatus.replace(/_/g, ' ')}
+                        </span>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Mobile Cards */}
+          <div className="sm:hidden flex flex-col divide-y">
+            {recentOrders.length === 0 ? (
+              <div className="p-8 text-center text-muted-foreground">
+                No orders found.
+              </div>
+            ) : (
+              recentOrders.map((order) => (
+                <div key={order.orderId} className="p-4 flex flex-col gap-2">
+                  <div className="flex justify-between items-start">
+                    <span className="font-mono text-xs font-semibold">
+                      #{order.orderId.slice(0, 8)}
+                    </span>
+                    <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold ${getStatusColor(order.orderStatus)}`}>
+                      {order.orderStatus.replace(/_/g, ' ')}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-end mt-1">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-xs text-muted-foreground">{formatTime(order.placedAt)}</span>
+                      {order.paymentMethod === "ONLINE" ? (
+                        <span className="inline-flex w-fit items-center rounded-full border border-blue-200 bg-blue-50 px-1.5 py-0 text-[10px] font-semibold text-blue-700">ONLINE</span>
+                      ) : (
+                        <span className="inline-flex w-fit items-center rounded-full border border-orange-200 bg-orange-50 px-1.5 py-0 text-[10px] font-semibold text-orange-700">COD</span>
+                      )}
+                    </div>
+                    <span className="text-sm font-bold">
+                      ₹{order.totalAmount.toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </CardContent>
       </Card>
     </div>

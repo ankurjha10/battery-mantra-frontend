@@ -205,7 +205,8 @@ function AdminLocations() {
         </Button>
       </div>
 
-      <div className="rounded-xl border bg-card overflow-hidden">
+      {/* Desktop Table */}
+      <div className="hidden md:block rounded-xl border bg-card overflow-hidden">
         <Table>
           <TableHeader className="bg-muted/50">
             <TableRow>
@@ -303,6 +304,92 @@ function AdminLocations() {
             )}
           </TableBody>
         </Table>
+      </div>
+
+      {/* Mobile Cards */}
+      <div className="md:hidden space-y-4">
+        {cities?.length === 0 ? (
+          <div className="text-center py-12 text-muted-foreground border rounded-xl border-dashed">
+            No cities found. Add your first city to get started.
+          </div>
+        ) : (
+          cities?.map((city) => (
+            <div key={city.cityId} className="rounded-xl border bg-card p-4 shadow-sm flex flex-col gap-4 relative overflow-hidden">
+              <div className="flex items-start gap-4">
+                {city.cityImage ? (
+                  <div className="w-16 h-16 shrink-0 rounded-lg overflow-hidden border">
+                    <img src={city.cityImage} alt={city.cityName} className="w-full h-full object-cover" />
+                  </div>
+                ) : (
+                  <div className="w-16 h-16 shrink-0 rounded-lg overflow-hidden border bg-gradient-to-br from-brand/10 to-brand/30 flex items-center justify-center text-brand font-bold text-2xl">
+                    {city.cityName.charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <div className="flex-1 min-w-0 pt-1">
+                  <h3 className="font-semibold text-base truncate">{city.cityName}</h3>
+                  <p className="text-sm text-muted-foreground truncate">{city.stateName}</p>
+                </div>
+              </div>
+              
+              <div className="flex flex-wrap gap-1.5 pt-2 border-t">
+                {city.isPopular && <Badge variant="default" className="text-[10px] py-0 h-5 bg-amber-500 hover:bg-amber-600">Popular</Badge>}
+                {city.isCodAvailable ? (
+                  <Badge variant="outline" className="text-[10px] py-0 h-5 text-green-600 border-green-200 bg-green-50">COD Yes</Badge>
+                ) : (
+                  <Badge variant="outline" className="text-[10px] py-0 h-5 text-red-500 border-red-200 bg-red-50">COD No</Badge>
+                )}
+                {city.isExchangeAvailable ? (
+                  <Badge variant="outline" className="text-[10px] py-0 h-5 text-blue-600 border-blue-200 bg-blue-50">Exchange Yes</Badge>
+                ) : (
+                  <Badge variant="outline" className="text-[10px] py-0 h-5 text-red-500 border-red-200 bg-red-50">Exchange No</Badge>
+                )}
+              </div>
+              
+              <div className="flex items-center justify-between gap-2 pt-2 border-t">
+                <Button 
+                  variant="secondary" 
+                  size="sm" 
+                  onClick={() => setSelectedCityForPincodes(city)}
+                  className="gap-1.5 h-8 text-xs flex-1"
+                >
+                  <MapPin className="h-3.5 w-3.5" />
+                  {city.pincodeCount} Pincodes
+                </Button>
+                
+                <div className="flex items-center gap-1">
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => openEditCityModal(city)}>
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete {city.cityName}?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. This will permanently delete the city and all its associated pincodes.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction 
+                          onClick={() => deleteCityMutation.mutate(city.cityId)}
+                          className="bg-destructive hover:bg-destructive/90"
+                        >
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       {/* City Create/Edit Modal */}

@@ -19,7 +19,8 @@ function AdminUsers() {
         <p className="text-muted-foreground">Manage your store's users and roles.</p>
       </div>
 
-      <div className="rounded-md border bg-card">
+      {/* Desktop Table */}
+      <div className="hidden md:block rounded-md border bg-card">
         <Table>
           <TableHeader>
             <TableRow>
@@ -60,6 +61,38 @@ function AdminUsers() {
             )}
           </TableBody>
         </Table>
+      </div>
+
+      {/* Mobile Cards */}
+      <div className="md:hidden space-y-3">
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <Spinner size="sm" className="mr-2" /> Loading...
+          </div>
+        ) : !users?.length ? (
+          <div className="text-center py-12 text-muted-foreground border rounded-xl bg-card border-dashed">
+            No users found.
+          </div>
+        ) : (
+          users.map((user) => (
+            <div key={user.userId} className="rounded-xl border bg-card p-4 shadow-sm flex flex-col gap-3">
+              <div className="flex justify-between items-start">
+                <div>
+                  <div className="font-semibold">{user.username || user.name}</div>
+                  <div className="text-sm text-muted-foreground">{user.email}</div>
+                </div>
+                <Badge variant={user.role === "ADMIN" ? "default" : "secondary"}>
+                  {user.role}
+                </Badge>
+              </div>
+              
+              <div className="flex justify-between items-center text-xs text-muted-foreground pt-3 border-t">
+                <span className="font-mono">ID: {user.userId.slice(0, 8)}</span>
+                <span>Joined: {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}</span>
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

@@ -136,7 +136,8 @@ function AdminBrands() {
         </Button>
       </div>
 
-      <div className="rounded-md border bg-card">
+      {/* Desktop Table */}
+      <div className="hidden md:block rounded-md border bg-card">
         <Table>
           <TableHeader>
             <TableRow>
@@ -212,6 +213,68 @@ function AdminBrands() {
             )}
           </TableBody>
         </Table>
+      </div>
+
+      {/* Mobile Cards */}
+      <div className="md:hidden space-y-3">
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <Spinner size="sm" className="mr-2" /> Loading...
+          </div>
+        ) : !brands?.length ? (
+          <div className="text-center py-12 text-muted-foreground">
+            No brands found.
+          </div>
+        ) : (
+          brands.map((brand) => (
+            <div key={brand.brandId} className="rounded-xl border bg-card p-4 shadow-sm flex items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="shrink-0 w-16 h-12 flex items-center justify-center border rounded-lg bg-muted/30 p-1">
+                  {brand.brandLogo ? (
+                    <img src={brand.brandLogo} alt={brand.brandName} className="h-full w-full object-contain mix-blend-multiply" />
+                  ) : (
+                    <Tag className="h-5 w-5 text-muted-foreground" />
+                  )}
+                </div>
+                <div>
+                  <h3 className="font-semibold text-sm">{brand.brandName}</h3>
+                  {brand.featured && (
+                    <span className="inline-block mt-1 rounded bg-primary-soft px-1.5 py-0.5 text-[10px] font-medium text-primary">Featured</span>
+                  )}
+                </div>
+              </div>
+              <div className="flex flex-col gap-1 shrink-0">
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => openEditModal(brand)}>
+                  <Edit className="h-4 w-4" />
+                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10">
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will permanently delete the brand "{brand.brandName}".
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction 
+                        onClick={() => deleteMutation.mutate(brand.brandId)}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       <Dialog open={isModalOpen} onOpenChange={(open) => !open && closeModal()}>

@@ -27,7 +27,7 @@ import {
 import { EmptyState } from "@/components/feedback/EmptyState";
 import { ErrorState } from "@/components/feedback/ErrorState";
 import { ApiError } from "@/lib/api/errors";
-import { productDetailQuery, productListQuery } from "@/queries";
+import { productDetailQuery, productListQuery, vehiclesListQuery } from "@/queries";
 import { queryKeys } from "@/constants/queryKeys";
 import { useAuth } from "@/providers/AuthProvider";
 import { cartService } from "@/services/cart.service";
@@ -93,6 +93,15 @@ function PdpPage() {
   const { isServiceable, pincode, city } = useLocationStore();
   const locationChecked = Boolean(pincode || city);
   const blockPurchase = locationChecked && !isServiceable;
+
+  const vehicles = useQuery(vehiclesListQuery());
+  const displayVehicles = data.capacity 
+    ? vehicles.data?.filter(v => {
+        if (!v.capacity) return false;
+        const vCaps = v.capacity.split(",").map(c => c.trim()).filter(Boolean);
+        return vCaps.includes(data.capacity as string);
+      })
+    : data.compatibleVehicles;
 
   useEffect(() => {
     if (data?.productImage && !activeImage) {
@@ -439,10 +448,10 @@ function PdpPage() {
           </TabsContent>
           
           <TabsContent value="vehicles" className="p-2 sm:p-4 outline-none">
-            {data.compatibleVehicles && data.compatibleVehicles.length > 0 ? (
-              <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {data.compatibleVehicles.map((v) => (
-                  <li key={v.vehicleId} className="flex items-center gap-3 rounded-xl border bg-muted/30 p-3 hover:bg-muted/50 transition-colors">
+            {displayVehicles && displayVehicles.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {displayVehicles.map((v) => (
+                  <div key={v.vehicleId} className="flex items-center gap-3 rounded-xl border bg-muted/30 p-3 hover:bg-muted/50 transition-colors">
                     {v.imageUrl ? (
                       <div className="h-10 w-10 shrink-0 rounded bg-white p-1">
                         <img src={v.imageUrl} alt={v.model} className="h-full w-full object-contain" />
@@ -458,9 +467,9 @@ function PdpPage() {
                         {[v.fuelType].filter(Boolean).join(" • ")}
                       </div>
                     </div>
-                  </li>
+                  </div>
                 ))}
-              </ul>
+              </div>
             ) : (
               <EmptyState title="No Compatibility Data" description="Vehicle compatibility is not available for this product yet." />
             )}

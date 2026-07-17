@@ -28,6 +28,7 @@ import { Route as OrdersOrderIdRouteImport } from './routes/orders.$orderId'
 import { Route as AdminVehiclesRouteImport } from './routes/admin.vehicles'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
+import { Route as AdminLocationsRouteImport } from './routes/admin.locations'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
 import { Route as AdminCallbacksRouteImport } from './routes/admin.callbacks'
 import { Route as AdminBrandsRouteImport } from './routes/admin.brands'
@@ -132,6 +133,11 @@ const AdminOrdersRoute = AdminOrdersRouteImport.update({
   path: '/orders',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminLocationsRoute = AdminLocationsRouteImport.update({
+  id: '/locations',
+  path: '/locations',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
   id: '/categories',
   path: '/categories',
@@ -196,6 +202,7 @@ export interface FileRoutesByFullPath {
   '/admin/brands': typeof AdminBrandsRoute
   '/admin/callbacks': typeof AdminCallbacksRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/locations': typeof AdminLocationsRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/vehicles': typeof AdminVehiclesRoute
@@ -224,6 +231,7 @@ export interface FileRoutesByTo {
   '/admin/brands': typeof AdminBrandsRoute
   '/admin/callbacks': typeof AdminCallbacksRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/locations': typeof AdminLocationsRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/vehicles': typeof AdminVehiclesRoute
@@ -255,6 +263,7 @@ export interface FileRoutesById {
   '/admin/brands': typeof AdminBrandsRoute
   '/admin/callbacks': typeof AdminCallbacksRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/locations': typeof AdminLocationsRoute
   '/admin/orders': typeof AdminOrdersRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/vehicles': typeof AdminVehiclesRoute
@@ -286,6 +295,7 @@ export interface FileRouteTypes {
     | '/admin/brands'
     | '/admin/callbacks'
     | '/admin/categories'
+    | '/admin/locations'
     | '/admin/orders'
     | '/admin/users'
     | '/admin/vehicles'
@@ -314,6 +324,7 @@ export interface FileRouteTypes {
     | '/admin/brands'
     | '/admin/callbacks'
     | '/admin/categories'
+    | '/admin/locations'
     | '/admin/orders'
     | '/admin/users'
     | '/admin/vehicles'
@@ -344,6 +355,7 @@ export interface FileRouteTypes {
     | '/admin/brands'
     | '/admin/callbacks'
     | '/admin/categories'
+    | '/admin/locations'
     | '/admin/orders'
     | '/admin/users'
     | '/admin/vehicles'
@@ -510,6 +522,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminOrdersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/locations': {
+      id: '/admin/locations'
+      path: '/locations'
+      fullPath: '/admin/locations'
+      preLoaderRoute: typeof AdminLocationsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/categories': {
       id: '/admin/categories'
       path: '/categories'
@@ -593,6 +612,7 @@ interface AdminRouteChildren {
   AdminBrandsRoute: typeof AdminBrandsRoute
   AdminCallbacksRoute: typeof AdminCallbacksRoute
   AdminCategoriesRoute: typeof AdminCategoriesRoute
+  AdminLocationsRoute: typeof AdminLocationsRoute
   AdminOrdersRoute: typeof AdminOrdersRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminVehiclesRoute: typeof AdminVehiclesRoute
@@ -607,6 +627,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminBrandsRoute: AdminBrandsRoute,
   AdminCallbacksRoute: AdminCallbacksRoute,
   AdminCategoriesRoute: AdminCategoriesRoute,
+  AdminLocationsRoute: AdminLocationsRoute,
   AdminOrdersRoute: AdminOrdersRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminVehiclesRoute: AdminVehiclesRoute,

@@ -170,7 +170,7 @@ function AddProductPage() {
   const watchImageUrl = form.watch("productImage");
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6 pb-20">
+    <div className="mx-auto max-w-5xl space-y-6 pb-24">
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" onClick={() => navigate({ to: "/admin/products" as any })}>
           <ArrowLeft className="h-5 w-5" />

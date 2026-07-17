@@ -52,6 +52,7 @@ export type VehicleResponse = {
   yearTo?: number;
   fuelType?: FuelType;
   imageUrl?: string | null;
+  capacity?: string;
 };
 export type CreateVehicleRequest = {
   vehicleType: VehicleType;
@@ -163,6 +164,7 @@ export type ProductFilterParams = {
   vehicleId?: UUID;
   minPrice?: number;
   maxPrice?: number;
+  capacity?: string;
   specKey?: string;
   specValue?: string;
   keyword?: string;

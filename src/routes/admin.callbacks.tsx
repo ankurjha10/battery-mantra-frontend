@@ -41,7 +41,8 @@ function AdminCallbacks() {
         </div>
       </div>
 
-      <div className="rounded-md border border-border bg-card">
+      {/* Desktop Table */}
+      <div className="hidden md:block rounded-md border border-border bg-card">
         <Table>
           <TableHeader>
             <TableRow>
@@ -110,6 +111,63 @@ function AdminCallbacks() {
             )}
           </TableBody>
         </Table>
+      </div>
+
+      {/* Mobile Cards */}
+      <div className="md:hidden space-y-3">
+        {isLoading ? (
+          <div className="flex justify-center py-12">
+            <Spinner />
+          </div>
+        ) : !callbacks || callbacks.length === 0 ? (
+          <div className="text-center py-12 text-muted-foreground border rounded-xl bg-card border-dashed">
+            No callback requests found.
+          </div>
+        ) : (
+          callbacks.map((c) => (
+            <div key={c.callbackId} className="rounded-xl border bg-card p-4 shadow-sm flex flex-col gap-3">
+              <div className="flex justify-between items-start">
+                <div className="flex items-center gap-2 font-medium">
+                  <PhoneCall className="w-4 h-4 text-muted-foreground" />
+                  {c.mobileNumber}
+                </div>
+                <span
+                  className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                    c.status === "RESOLVED"
+                      ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                      : "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400"
+                  }`}
+                >
+                  {c.status}
+                </span>
+              </div>
+              
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <Clock className="w-3.5 h-3.5" />
+                {format(new Date(c.createdAt), "PPp")}
+              </div>
+              
+              <div className="pt-2 border-t mt-1 flex justify-end">
+                {c.status === "PENDING" ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full sm:w-auto h-8 text-xs"
+                    onClick={() =>
+                      updateStatus.mutate({ id: c.callbackId.toString(), status: "RESOLVED" })
+                    }
+                    disabled={updateStatus.isPending}
+                  >
+                    <CheckCircle2 className="w-3.5 h-3.5 mr-1.5 text-green-500" />
+                    Mark Resolved
+                  </Button>
+                ) : (
+                  <span className="text-xs text-muted-foreground">Completed</span>
+                )}
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

@@ -245,7 +245,8 @@ function AdminCategories() {
         </Button>
       </div>
 
-      <div className="rounded-md border bg-card">
+      {/* Desktop Table */}
+      <div className="hidden md:block rounded-md border bg-card">
         <Table>
           <TableHeader>
             <TableRow>
@@ -274,6 +275,101 @@ function AdminCategories() {
             )}
           </TableBody>
         </Table>
+      </div>
+
+      {/* Mobile Cards */}
+      <div className="md:hidden space-y-3">
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <Spinner size="sm" className="mr-2" /> Loading...
+          </div>
+        ) : !categories?.length ? (
+          <div className="text-center py-12 text-muted-foreground">
+            No categories found.
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {(() => {
+              const renderMobileCards = (cats: CategoryListResponse[], depth: number = 0) => {
+                const sorted = [...cats].sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
+                const elements: React.ReactNode[] = [];
+                
+                sorted.forEach((category) => {
+                  elements.push(
+                    <div key={category.categoryId} className="rounded-xl border bg-card p-3 shadow-sm relative overflow-hidden" style={{ marginLeft: `${depth * 16}px` }}>
+                      {depth > 0 && (
+                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-muted"></div>
+                      )}
+                      <div className="flex items-start gap-3">
+                        <div className="shrink-0 mt-0.5">
+                          {category.iconUrl ? (
+                            <div className="w-10 h-10 rounded-md border bg-muted/30 overflow-hidden flex items-center justify-center">
+                              <img src={category.iconUrl} alt={category.categoryName} className="w-full h-full object-contain p-1 mix-blend-multiply" />
+                            </div>
+                          ) : (
+                            <div className="w-10 h-10 rounded-md border bg-muted/30 flex items-center justify-center text-muted-foreground">
+                              {depth > 0 ? <CornerDownRight className="h-5 w-5" /> : <Layers className="h-5 w-5" />}
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-2">
+                            <h3 className="font-semibold text-sm truncate">{category.categoryName}</h3>
+                            <span className="text-xs text-muted-foreground font-mono shrink-0">#{category.displayOrder ?? 0}</span>
+                          </div>
+                          {category.categoryDescription && (
+                            <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{category.categoryDescription}</p>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center justify-end gap-1 mt-3 pt-3 border-t">
+                        <Button variant="ghost" size="sm" className="h-8 px-2 text-xs text-muted-foreground hover:text-foreground" onClick={() => openAddModal(category.categoryId)}>
+                          <Plus className="h-3.5 w-3.5 mr-1" /> Add Sub
+                        </Button>
+                        <Button variant="ghost" size="sm" className="h-8 px-2 text-xs" onClick={() => openEditModal(category)}>
+                          <Edit className="h-3.5 w-3.5 mr-1" /> Edit
+                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="ghost" size="sm" className="h-8 px-2 text-xs text-destructive hover:bg-destructive/10">
+                              <Trash2 className="h-3.5 w-3.5 mr-1" /> Delete
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This will permanently delete "{category.categoryName}" and all subcategories.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction 
+                                onClick={() => deleteMutation.mutate(category.categoryId)}
+                                className="bg-destructive hover:bg-destructive/90"
+                              >
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    </div>
+                  );
+                  
+                  if (category.subCategories && category.subCategories.length > 0) {
+                    elements.push(...renderMobileCards(category.subCategories, depth + 1));
+                  }
+                });
+                
+                return elements;
+              };
+              
+              return renderMobileCards(categories);
+            })()}
+          </div>
+        )}
       </div>
 
       <Dialog open={isModalOpen} onOpenChange={(open) => !open && closeModal()}>

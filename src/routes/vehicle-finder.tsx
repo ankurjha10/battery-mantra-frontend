@@ -13,7 +13,7 @@ import {
 import { ProductGrid } from "@/components/products/ProductGrid";
 import { ErrorState } from "@/components/feedback/ErrorState";
 import { EmptyState } from "@/components/feedback/EmptyState";
-import { productFilterQuery, vehiclesListQuery } from "@/queries";
+import { productFilterQuery, vehiclesListQuery, productListQuery } from "@/queries";
 
 const searchSchema = z.object({
   vehicleId: z.string().optional(),
@@ -60,10 +60,26 @@ function VehicleFinderPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search.vehicleId, vehicles.data]);
 
+  const allProducts = useQuery(productListQuery());
+  
+  const selectedVehicle = vehicles.data?.find((v) => v.vehicleId === selection.vehicleId);
+  const vehicleCapacities = selectedVehicle?.capacity 
+    ? selectedVehicle.capacity.split(",").map(c => c.trim()).filter(Boolean)
+    : [];
+
+  const compatibleProducts = (allProducts.data as any[])?.filter(p => {
+    if (!p.capacity) return false;
+    return vehicleCapacities.includes(p.capacity);
+  });
+
   const compat = useQuery({
     ...productFilterQuery({ vehicleId: selection.vehicleId ?? undefined, size: 40 }),
-    enabled: !!selection.vehicleId,
+    enabled: !!selection.vehicleId && vehicleCapacities.length === 0, // Fallback to backend filter if no capacity set
   });
+
+  const displayProducts = vehicleCapacities.length > 0 ? compatibleProducts : compat.data?.content;
+  const isLoadingProducts = vehicleCapacities.length > 0 ? allProducts.isLoading : compat.isLoading;
+  const isErrorProducts = vehicleCapacities.length > 0 ? allProducts.isError : compat.isError;
 
   return (
     <div>
@@ -95,16 +111,19 @@ function VehicleFinderPage() {
                 title="Pick your model"
                 description="Choose your vehicle make and model on the left to see compatible batteries."
               />
-            ) : compat.isError ? (
+            ) : isErrorProducts ? (
               <ErrorState
                 title="Couldn't load batteries"
                 description="Please try again in a moment."
-                onRetry={() => void compat.refetch()}
+                onRetry={() => {
+                  void compat.refetch();
+                  void allProducts.refetch();
+                }}
               />
             ) : (
               <ProductGrid
-                products={compat.data?.content}
-                loading={compat.isLoading}
+                products={displayProducts}
+                loading={isLoadingProducts}
                 emptyTitle="No batteries available"
                 emptyDescription="No batteries are listed for this vehicle yet."
               />

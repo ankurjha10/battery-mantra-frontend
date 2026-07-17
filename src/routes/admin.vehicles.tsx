@@ -307,7 +307,8 @@ function AdminVehicles() {
           </div>
         )}
 
-        <div className="rounded-md border bg-card">
+        {/* Desktop Table */}
+        <div className="hidden md:block rounded-md border bg-card">
           <Table>
             <TableHeader>
               <TableRow>
@@ -391,6 +392,83 @@ function AdminVehicles() {
               )}
             </TableBody>
           </Table>
+        </div>
+
+        {/* Mobile Cards */}
+        <div className="md:hidden space-y-3">
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Spinner size="sm" className="mr-2" /> Loading...
+            </div>
+          ) : !filteredVehicles?.length ? (
+            <div className="text-center py-12 text-muted-foreground">No vehicles found.</div>
+          ) : (
+            paginatedVehicles?.map((vehicle) => (
+              <div key={vehicle.vehicleId} className="rounded-xl border bg-card p-4 shadow-sm flex gap-3">
+                <div className="shrink-0">
+                  {vehicle.imageUrl ? (
+                    <div className="h-16 w-16 rounded-lg border bg-muted/30 overflow-hidden flex items-center justify-center">
+                      <img src={vehicle.imageUrl} alt={vehicle.make} className="w-full h-full object-contain p-1" />
+                    </div>
+                  ) : (
+                    <div className="h-16 w-16 rounded-lg border bg-muted/30 flex items-center justify-center text-muted-foreground">
+                      <Car className="h-6 w-6" />
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-start justify-between gap-2">
+                      <h3 className="font-semibold text-sm truncate">{vehicle.make} {vehicle.model}</h3>
+                      <span className="inline-flex shrink-0 items-center rounded-md bg-muted px-1.5 py-0.5 text-[10px] font-medium ring-1 ring-inset ring-muted-foreground/20">
+                        {vehicle.vehicleType}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                      {vehicle.fuelType && (
+                        <span className="text-xs text-muted-foreground">{vehicle.fuelType}</span>
+                      )}
+                      {vehicle.fuelType && vehicle.capacity && <span className="text-muted-foreground text-xs">•</span>}
+                      {vehicle.capacity && (
+                        <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
+                          {vehicle.capacity}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-end gap-1 mt-2">
+                    <Button variant="ghost" size="sm" className="h-8 px-2 text-xs" onClick={() => openEditModal(vehicle)}>
+                      <Edit className="h-3.5 w-3.5 mr-1" /> Edit
+                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-8 px-2 text-xs text-destructive hover:bg-destructive/10">
+                          <Trash2 className="h-3.5 w-3.5 mr-1" /> Delete
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This will permanently delete "{vehicle.make} {vehicle.model}".
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction 
+                            onClick={() => deleteMutation.mutate(vehicle.vehicleId)}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          >
+                            Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
         </div>
 
         {/* PAGINATION */}

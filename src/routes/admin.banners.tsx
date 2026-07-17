@@ -164,7 +164,8 @@ function AdminBanners() {
         </Button>
       </div>
 
-      <div className="rounded-md border bg-card">
+      {/* Desktop Table */}
+      <div className="hidden md:block rounded-md border bg-card">
         <Table>
           <TableHeader>
             <TableRow>
@@ -244,6 +245,85 @@ function AdminBanners() {
             )}
           </TableBody>
         </Table>
+      </div>
+
+      {/* Mobile Cards */}
+      <div className="md:hidden space-y-3">
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <Spinner size="sm" className="mr-2" /> Loading...
+          </div>
+        ) : !sortedBanners?.length ? (
+          <div className="text-center py-12 text-muted-foreground border rounded-xl bg-card border-dashed">
+            No banners found.
+          </div>
+        ) : (
+          sortedBanners.map((banner) => (
+            <div key={banner.bannerId} className="rounded-xl border bg-card p-4 shadow-sm flex flex-col gap-3">
+              <div className="flex items-start gap-4">
+                <div className="w-20 shrink-0">
+                  {banner.imageUrl ? (
+                    <img src={banner.imageUrl} alt={banner.title || "Banner"} className="h-12 w-full object-cover rounded border" />
+                  ) : (
+                    <div className="h-12 w-full flex items-center justify-center border rounded bg-muted">
+                      <ImageIcon className="h-5 w-5 text-muted-foreground" />
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0 flex flex-col justify-between h-full">
+                  <div className="flex justify-between items-start gap-2">
+                    <div className="font-semibold truncate">{banner.title || <span className="text-muted-foreground italic">Untitled</span>}</div>
+                    {banner.isActive ? (
+                      <span className="shrink-0 rounded bg-success/20 px-1.5 py-0.5 text-[10px] font-medium text-success uppercase">Active</span>
+                    ) : (
+                      <span className="shrink-0 rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground uppercase">Inactive</span>
+                    )}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1 truncate">
+                    {banner.linkUrl ? (
+                      <span>Link: {banner.linkUrl}</span>
+                    ) : (
+                      <span>No Link</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex justify-between items-center pt-3 border-t">
+                <div className="text-xs text-muted-foreground">Order: <span className="font-medium text-foreground">{banner.displayOrder}</span></div>
+                <div className="flex gap-1">
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => openEditModal(banner)}>
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will permanently delete the banner "{banner.title || banner.bannerId}".
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction 
+                          onClick={() => deleteMutation.mutate(banner.bannerId)}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       <Dialog open={isModalOpen} onOpenChange={(open) => !open && closeModal()}>

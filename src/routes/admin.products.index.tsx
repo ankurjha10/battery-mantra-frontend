@@ -114,7 +114,8 @@ function AdminProducts() {
         </Tabs>
       )}
 
-      <div className="rounded-md border bg-card">
+      {/* Desktop Table */}
+      <div className="hidden md:block rounded-md border bg-card">
         <Table>
           <TableHeader>
             <TableRow>
@@ -130,13 +131,13 @@ function AdminProducts() {
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={6} className="h-24 text-center">
+                <TableCell colSpan={7} className="h-24 text-center">
                   <Spinner size="sm" className="inline-block mr-2" /> Loading products...
                 </TableCell>
               </TableRow>
             ) : !products?.length ? (
               <TableRow>
-                <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
+                <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
                   No products found.
                 </TableCell>
               </TableRow>
@@ -200,6 +201,73 @@ function AdminProducts() {
             )}
           </TableBody>
         </Table>
+      </div>
+
+      {/* Mobile Cards */}
+      <div className="md:hidden space-y-3">
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <Spinner size="sm" className="mr-2" /> Loading...
+          </div>
+        ) : !products?.length ? (
+          <div className="text-center py-12 text-muted-foreground">No products found.</div>
+        ) : (
+          paginatedProducts?.map((product) => (
+            <div key={product.productId} className="rounded-xl border bg-card p-4 shadow-sm">
+              <div className="flex gap-3">
+                {product.productImage ? (
+                  <img src={product.productImage} alt={product.productName} className="h-14 w-14 rounded-lg object-cover border shrink-0" />
+                ) : (
+                  <div className="h-14 w-14 rounded-lg bg-muted flex items-center justify-center text-xs text-muted-foreground shrink-0">N/A</div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-sm truncate">{product.productName}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{product.brandName || "N/A"} · {product.productCategory || "N/A"}</p>
+                  <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                    <span className="font-semibold text-sm text-primary">₹{product.productPrice.toLocaleString()}</span>
+                    {product.capacity && (
+                      <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
+                        {product.capacity}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center justify-end gap-1 mt-3 pt-3 border-t">
+                <Button asChild variant="outline" size="sm" className="h-8 text-xs">
+                  <Link to={`/admin/products/${product.productId}/edit`}>
+                    <Edit className="h-3.5 w-3.5 mr-1.5" /> Edit
+                  </Link>
+                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="outline" size="sm" className="h-8 text-xs text-destructive border-destructive/30 hover:bg-destructive/10">
+                      <Trash2 className="h-3.5 w-3.5 mr-1.5" /> Delete
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will permanently delete the product "{product.productName}".
+                        This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction 
+                        onClick={() => deleteMutation.mutate(product.productId)}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       {/* PAGINATION */}
