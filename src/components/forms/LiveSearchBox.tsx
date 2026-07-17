@@ -98,7 +98,7 @@ export function LiveSearchBox({ value, onChange, onClear, containerClassName, on
               <span className="text-sm">Searching...</span>
             </div>
           ) : products.length > 0 ? (
-            <div className="flex flex-col max-h-[60vh] overflow-y-auto">
+            <div className="flex flex-col max-h-[60vh] overflow-y-auto scrollbar-custom">
               {products.map((product, index) => (
                 <Link
                   key={product.productId}
