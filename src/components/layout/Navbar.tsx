@@ -5,7 +5,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { Logo } from "@/components/common/Logo";
 import { Container } from "./Container";
 import { Button } from "@/components/ui/button";
-import { SearchBox } from "@/components/forms/SearchBox";
+import { LiveSearchBox } from "@/components/forms/LiveSearchBox";
 import { MobileNav } from "./MobileNav";
 import { LocationSelector } from "@/components/location/LocationSelector";
 import {
@@ -45,10 +45,14 @@ export function Navbar({ links = DEFAULT_LINKS }: { links?: NavLink[] }) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const onSearch = (e: FormEvent) => {
-    e.preventDefault();
+  const handleSearchSubmit = () => {
     const q = query.trim();
     navigate({ to: "/products", search: q ? { q } : {} });
+  };
+
+  const onSearch = (e: FormEvent) => {
+    e.preventDefault();
+    handleSearchSubmit();
   };
 
   return (
@@ -89,10 +93,11 @@ export function Navbar({ links = DEFAULT_LINKS }: { links?: NavLink[] }) {
         </div>
 
         <form onSubmit={onSearch} className="hidden flex-1 max-w-2xl mx-4 lg:block">
-          <SearchBox
+          <LiveSearchBox
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onClear={() => setQuery("")}
+            onSubmit={handleSearchSubmit}
             containerClassName="max-w-2xl mx-auto"
           />
         </form>
@@ -170,10 +175,11 @@ export function Navbar({ links = DEFAULT_LINKS }: { links?: NavLink[] }) {
       <div className="border-t border-border lg:hidden">
         <Container size="xl" className="py-2.5">
           <form onSubmit={onSearch}>
-            <SearchBox
+            <LiveSearchBox
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onClear={() => setQuery("")}
+              onSubmit={handleSearchSubmit}
             />
           </form>
         </Container>
