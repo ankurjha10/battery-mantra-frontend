@@ -1,14 +1,17 @@
-import { Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { locationService } from "@/services/location.service";
 import { MapPin } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { useLocationStore } from "@/store/useLocationStore";
 
 interface SeoCityLinksProps {
   productName: string;
 }
 
 export function SeoCityLinks({ productName }: SeoCityLinksProps) {
+  const qc = useQueryClient();
+  const { setLocation } = useLocationStore();
+  
   const { data: cities } = useQuery({
     queryKey: ["locations", "public-cities"],
     queryFn: () => locationService.getPublicCities(),
@@ -29,17 +32,22 @@ export function SeoCityLinks({ productName }: SeoCityLinksProps) {
           <AccordionContent className="pt-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-2 gap-x-4">
               {cities.map((city) => (
-                <Link
+                <a
                   key={city.cityId}
-                  to="/products"
-                  search={{ q: `${productName} in ${city.cityName}` }}
-                  className="text-sm text-muted-foreground hover:text-brand transition-colors truncate flex items-center gap-1.5"
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setLocation("", true, city);
+                    qc.invalidateQueries({ queryKey: ["products"] });
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                  className="text-sm text-muted-foreground hover:text-brand transition-colors truncate flex items-center gap-1.5 cursor-pointer text-left"
                 >
                   <MapPin className="h-3 w-3 shrink-0 opacity-50" />
                   <span className="truncate">
                     {productName} in {city.cityName}
                   </span>
-                </Link>
+                </a>
               ))}
             </div>
           </AccordionContent>
