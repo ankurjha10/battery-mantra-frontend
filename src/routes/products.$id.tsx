@@ -166,7 +166,7 @@ function PdpPage() {
     const k = key.toLowerCase();
     if (k.includes("warranty")) return 1;
     if (k.includes("capacity")) return 2;
-    if (k.includes("product type") || k === "type") return 3;
+    if (k.includes("battery type") || k.includes("product type") || k === "type") return 3;
     return 99;
   };
 
