@@ -161,7 +161,18 @@ function PdpPage() {
   };
 
   const allFlatSpecs = flattenSpecs(data.specs);
-  const topSpecs = allFlatSpecs.slice(0, 4);
+  
+  const getPriorityScore = (key: string) => {
+    const k = key.toLowerCase();
+    if (k.includes("warranty")) return 1;
+    if (k.includes("capacity")) return 2;
+    if (k.includes("product type") || k === "type") return 3;
+    return 99;
+  };
+
+  const topSpecs = [...allFlatSpecs]
+    .sort((a, b) => getPriorityScore(a[0]) - getPriorityScore(b[0]))
+    .slice(0, 4);
 
   const originalPrice = data.specs?.originalPrice ? Number(data.specs.originalPrice) : null;
   const hasDiscount = originalPrice && originalPrice > data.productPrice;
