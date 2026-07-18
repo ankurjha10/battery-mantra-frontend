@@ -29,6 +29,15 @@ const navigation = [
   { name: "Callbacks", href: "/admin/callbacks", icon: PhoneCall },
 ];
 
+const seoNavigation = [
+  { name: "Google Products Feed", href: "/api/seo/google-feed.xml", icon: Package, external: true },
+  { name: "SEO Pages", href: "/admin/seo/pages", icon: Layers },
+  { name: "SEO Quick (Brands)", href: "/admin/seo/quick/brands", icon: Tag },
+  { name: "SEO Quick (Manufacturers)", href: "/admin/seo/quick/manufacturers", icon: Layers },
+  { name: "SEO Quick (Categories)", href: "/admin/seo/quick/categories", icon: Layers },
+  { name: "SEO Quick (Products)", href: "/admin/seo/quick/products", icon: Package },
+];
+
 export function AdminSidebar() {
   const { pathname } = useLocation();
   const { signOut } = useAuth();
@@ -56,6 +65,34 @@ export function AdminSidebar() {
                         <item.icon />
                         <span>{item.name}</span>
                       </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>SEO</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {seoNavigation.map((item) => {
+                const isActive = pathname === item.href || pathname.startsWith(item.href);
+                return (
+                  <SidebarMenuItem key={item.name}>
+                    <SidebarMenuButton asChild isActive={isActive && !item.external} tooltip={item.name}>
+                      {item.external ? (
+                        <a href={item.href} target="_blank" rel="noopener noreferrer">
+                          <item.icon />
+                          <span>{item.name}</span>
+                        </a>
+                      ) : (
+                        <Link to={item.href}>
+                          <item.icon />
+                          <span>{item.name}</span>
+                        </Link>
+                      )}
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );

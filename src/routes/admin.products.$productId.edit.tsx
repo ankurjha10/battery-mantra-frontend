@@ -46,7 +46,21 @@ const formSchema = z.object({
     price: z.coerce.number().min(0, "Price must be positive"),
     exchangePrice: z.coerce.number().min(0).optional().default(0),
     stock: z.coerce.number().min(0).optional().default(0),
-  })).default([])
+  })).default([]),
+  seo: z.object({
+    slug: z.string().optional(),
+    metaTitle: z.string().optional(),
+    metaDescription: z.string().optional(),
+    metaKeywords: z.string().optional(),
+    metaTitleCity: z.string().optional(),
+    metaDescriptionCity: z.string().optional(),
+    metaKeywordsCity: z.string().optional(),
+    ogTitle: z.string().optional(),
+    ogDescription: z.string().optional(),
+    ogTitleCity: z.string().optional(),
+    ogDescriptionCity: z.string().optional(),
+    canonicalUrl: z.string().optional(),
+  }).optional().default({})
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -119,6 +133,20 @@ function EditProductPage() {
       ...cp,
       exchangePrice: cp.exchangeDiscount && cp.exchangeDiscount > 0 ? cp.price - cp.exchangeDiscount : 0
     })) || [],
+    seo: product.seo || {
+      slug: "",
+      metaTitle: "",
+      metaDescription: "",
+      metaKeywords: "",
+      metaTitleCity: "",
+      metaDescriptionCity: "",
+      metaKeywordsCity: "",
+      ogTitle: "",
+      ogDescription: "",
+      ogTitleCity: "",
+      ogDescriptionCity: "",
+      canonicalUrl: "",
+    }
   };
 
   return <EditProductForm productId={productId} defaultValues={defaultValues} />;
@@ -579,6 +607,60 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
                   </SelectContent>
                 </Select>
                 {form.formState.errors.brandId && <p className="text-xs text-red-500">{form.formState.errors.brandId.message}</p>}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* SEO Information */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">SEO Information</CardTitle>
+              <CardDescription>Configure search engine optimization for this product</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label>Product URL (Slug) <span className="text-muted-foreground font-normal ml-2">Leave blank to auto-generate from name</span></Label>
+                <Input placeholder="e.g., exide-mileage-ml38b20l-battery" {...form.register("seo.slug")} />
+              </div>
+              <div className="space-y-2">
+                <Label>SEO Title</Label>
+                <Input placeholder="Buy Exide Mileage ML38B20L 35Ah Car Battery at Best Price | Batterymantra.com" {...form.register("seo.metaTitle")} />
+              </div>
+              <div className="space-y-2">
+                <Label>Search / SEO Keywords</Label>
+                <Input placeholder="Exide Car Battery MI38B20L, Exide 35Ah Car battery..." {...form.register("seo.metaKeywords")} />
+              </div>
+              <div className="space-y-2">
+                <Label>SEO Description</Label>
+                <Input placeholder="Buy Exide Mileage ML38B20L 35Ah Car Battery At Best Price | Cash On Delivery..." {...form.register("seo.metaDescription")} />
+              </div>
+              <div className="space-y-2 mt-4">
+                <Label>SEO Title City <span className="text-muted-foreground font-normal">(Name code : delivery_time, city_name)</span></Label>
+                <Input placeholder="Exide Mileage ML38B20L 35Ah Car Battery Price in city_name | Batterymantra.com" {...form.register("seo.metaTitleCity")} />
+              </div>
+              <div className="space-y-2">
+                <Label>SEO Keywords City <span className="text-muted-foreground font-normal">(Name code : delivery_time, city_name)</span></Label>
+                <Input placeholder="Exide Mileage ML38B20L 35Ah Car Battery At Best Price in city_name" {...form.register("seo.metaKeywordsCity")} />
+              </div>
+              <div className="space-y-2">
+                <Label>SEO Description City <span className="text-muted-foreground font-normal">(Name code : delivery_time, city_name)</span></Label>
+                <Input placeholder="Buy Exide Mileage ML38B20L 35Ah Car Battery At Best Price in city_name | 100% genuine..." {...form.register("seo.metaDescriptionCity")} />
+              </div>
+              <div className="space-y-2 mt-4">
+                <Label>OG Title</Label>
+                <Input placeholder="Buy Exide Mileage ML38B20L 35Ah Car Battery at Best Price | Batterymantra.com" {...form.register("seo.ogTitle")} />
+              </div>
+              <div className="space-y-2">
+                <Label>OG Description</Label>
+                <Input placeholder="Buy Exide Mileage ML38B20L 35Ah Car Battery At Best Price | Cash On Delivery..." {...form.register("seo.ogDescription")} />
+              </div>
+              <div className="space-y-2 mt-4">
+                <Label>OG Title City <span className="text-muted-foreground font-normal">(Name code : delivery_time, city_name)</span></Label>
+                <Input placeholder="Exide Mileage ML38B20L 35Ah Car Battery Price in city_name | Batterymantra.com" {...form.register("seo.ogTitleCity")} />
+              </div>
+              <div className="space-y-2">
+                <Label>OG Description City <span className="text-muted-foreground font-normal">(Name code : delivery_time, city_name)</span></Label>
+                <Input placeholder="Buy Exide Mileage ML38B20L 35Ah Car Battery At Best Price in city_name | 100% genuine..." {...form.register("seo.ogDescriptionCity")} />
               </div>
             </CardContent>
           </Card>
