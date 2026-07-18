@@ -98,7 +98,7 @@ export function ProductImportModal({ isOpen, onClose }: ProductImportModalProps)
             }
 
             // Extract specs
-            const standardCols = ["ProductName", "ProductDescription", "ProductPrice", "OriginalPrice", "ExchangeDiscount", "ProductStock", "ProductImage", "BrandName", "CategoryName", "CompatibleVehicles"];
+            const standardCols = ["ProductName", "ProductDescription", "ProductPrice", "OriginalPrice", "ExchangePrice", "ProductStock", "ProductImage", "BrandName", "CategoryName", "CompatibleVehicles"];
             const specs: Record<string, Record<string, string>> = { "Technical Details": {} };
             let hasSpecs = false;
             
@@ -112,7 +112,7 @@ export function ProductImportModal({ isOpen, onClose }: ProductImportModalProps)
             // Only parse values if they are valid numbers
             const parsedPrice = parseInt(row["ProductPrice"]);
             const parsedOriginalPrice = parseInt(row["OriginalPrice"]);
-            const parsedExchangeDiscount = parseInt(row["ExchangeDiscount"]);
+            const parsedExchangePrice = parseInt(row["ExchangePrice"]);
             const parsedStock = parseInt(row["ProductStock"]);
             
             if (!isNaN(parsedOriginalPrice)) {
@@ -124,12 +124,16 @@ export function ProductImportModal({ isOpen, onClose }: ProductImportModalProps)
             if (pDesc.length > 2000) {
               pDesc = pDesc.substring(0, 1997) + "..."; // truncate to prevent DB constraint errors
             }
+            
+            const productPrice = isNaN(parsedPrice) ? 0 : parsedPrice;
+            const exchangePrice = isNaN(parsedExchangePrice) ? 0 : parsedExchangePrice;
+            const exchangeDiscount = (exchangePrice > 0 && exchangePrice < productPrice) ? (productPrice - exchangePrice) : 0;
 
             const payload: CreateProductRequest = {
               productName: row["ProductName"] || "Unknown Product",
               productDescription: pDesc,
-              productPrice: isNaN(parsedPrice) ? 0 : parsedPrice,
-              exchangeDiscount: isNaN(parsedExchangeDiscount) ? 0 : parsedExchangeDiscount,
+              productPrice: productPrice,
+              exchangeDiscount: exchangeDiscount,
               productStock: isNaN(parsedStock) ? 0 : parsedStock,
               productImage: row["ProductImage"],
               categoryId,
@@ -189,7 +193,7 @@ export function ProductImportModal({ isOpen, onClose }: ProductImportModalProps)
             <p className="font-semibold text-foreground">Smart CSV Format:</p>
             <p className="text-muted-foreground leading-relaxed">
               Standard Columns: <code className="block mt-1 bg-background p-1.5 rounded border border-border font-mono text-[11px] text-foreground">
-                ProductName, ProductDescription, ProductPrice, OriginalPrice, ExchangeDiscount, ProductStock, ProductImage, BrandName, CategoryName, CompatibleVehicles
+                ProductName, ProductDescription, ProductPrice, OriginalPrice, ExchangePrice, ProductStock, ProductImage, BrandName, CategoryName, CompatibleVehicles
               </code>
             </p>
             <p className="text-muted-foreground mt-2">

@@ -26,7 +26,7 @@ const formSchema = z.object({
   productDescription: z.string().optional(),
   productPrice: z.coerce.number().min(0, "Price must be positive"),
   originalPrice: z.coerce.number().min(0).optional(),
-  exchangeDiscount: z.coerce.number().min(0).optional().default(0),
+  exchangePrice: z.coerce.number().min(0).optional().default(0),
   productStock: z.coerce.number().min(0).optional(),
   productImage: z.string().min(1, "Primary image URL is required"),
   additionalImages: z.array(z.object({
@@ -45,7 +45,7 @@ const formSchema = z.object({
   cityPrices: z.array(z.object({
     cityId: z.string().uuid("City is required"),
     price: z.coerce.number().min(0, "Price must be positive"),
-    exchangeDiscount: z.coerce.number().min(0).optional().default(0),
+    exchangePrice: z.coerce.number().min(0).optional().default(0),
     stock: z.coerce.number().min(0).optional().default(0),
   })).default([])
 });
@@ -75,7 +75,7 @@ function AddProductPage() {
       productDescription: "",
       productPrice: 0,
       originalPrice: 0,
-      exchangeDiscount: 0,
+      exchangePrice: 0,
       productStock: 0,
       productImage: "",
       additionalImages: [],
@@ -154,7 +154,7 @@ function AddProductPage() {
       productName: data.productName,
       productDescription: data.productDescription || undefined,
       productPrice: data.productPrice,
-      exchangeDiscount: data.exchangeDiscount,
+      exchangeDiscount: data.exchangePrice && data.exchangePrice > 0 && data.exchangePrice < data.productPrice ? data.productPrice - data.exchangePrice : 0,
       productStock: data.productStock,
       productImage: data.productImage || undefined,
       additionalImages: data.additionalImages.length > 0 ? data.additionalImages.map(img => img.url).filter(Boolean) : undefined,
@@ -162,7 +162,12 @@ function AddProductPage() {
       brandId: data.brandId,
       capacity: data.capacity || undefined,
       specs: Object.keys(specsRecord).length > 0 ? specsRecord : undefined,
-      cityPrices: data.cityPrices.length > 0 ? data.cityPrices : undefined
+      cityPrices: data.cityPrices.length > 0 ? data.cityPrices.map(cp => ({
+        cityId: cp.cityId,
+        price: cp.price,
+        exchangeDiscount: cp.exchangePrice && cp.exchangePrice > 0 && cp.exchangePrice < cp.price ? cp.price - cp.exchangePrice : 0,
+        stock: cp.stock
+      })) : undefined
     };
 
     createMutation.mutate(payload);
@@ -339,7 +344,7 @@ function AddProductPage() {
                 <CardTitle>Area-Wise Pricing (Optional)</CardTitle>
                 <CardDescription>Override global price and stock for specific cities.</CardDescription>
               </div>
-              <Button type="button" variant="outline" size="sm" onClick={() => appendCityPricing({ cityId: "", price: 0, exchangeDiscount: 0, stock: 0 })}>
+              <Button type="button" variant="outline" size="sm" onClick={() => appendCityPricing({ cityId: "", price: 0, exchangePrice: 0, stock: 0 })}>
                 <Plus className="h-4 w-4 mr-2" /> Add Override
               </Button>
             </CardHeader>
@@ -382,8 +387,8 @@ function AddProductPage() {
                         <Input type="number" min="0" step="1" {...form.register(`cityPrices.${idx}.price` as const)} />
                       </div>
                       <div className="space-y-2">
-                        <Label>Discount (₹)</Label>
-                        <Input type="number" min="0" step="1" {...form.register(`cityPrices.${idx}.exchangeDiscount` as const)} />
+                        <Label>Exchange Price</Label>
+                        <Input type="number" min="0" step="1" {...form.register(`cityPrices.${idx}.exchangePrice` as const)} />
                       </div>
                       <div className="space-y-2">
                         <Label>Stock</Label>
@@ -415,9 +420,10 @@ function AddProductPage() {
                 <p className="text-xs text-muted-foreground">Strikethrough price. Leave 0 if none.</p>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="exchangeDiscount">Exchange Discount (₹)</Label>
-                <Input id="exchangeDiscount" type="number" min="0" step="1" {...form.register("exchangeDiscount")} />
-                <p className="text-xs text-muted-foreground">Set to 0 if exchange is not applicable for this battery.</p>
+                <Label htmlFor="exchangePrice">Price with Exchange (₹)</Label>
+                <Input id="exchangePrice" type="number" min="0" step="1" {...form.register("exchangePrice")} placeholder="Final price after exchange" />
+                <p className="text-[10px] text-muted-foreground mt-1">Leave as 0 if no exchange is offered.</p>
+                {form.formState.errors.exchangePrice && <p className="text-xs text-red-500">{form.formState.errors.exchangePrice.message}</p>}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="productStock">Stock Quantity</Label>
