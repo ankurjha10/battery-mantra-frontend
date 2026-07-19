@@ -1,4 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
+import { env } from "@/lib/utils/env";
 import { LayoutDashboard, Users, ShoppingCart, Package, LogOut, Layers, Tag, Car, Image, PhoneCall, MapPin } from "lucide-react";
 import {
   Sidebar,
@@ -31,7 +32,7 @@ const navigation = [
 ];
 
 const seoNavigation = [
-  { name: "Google Products Feed", href: "/api/seo/google-feed.xml", icon: Package, external: true },
+  { name: "Google Products Feed", href: `${env.API_BASE_URL || 'http://localhost:8080'}/api/seo/google-feed.xml`, icon: Package, external: true },
   { name: "SEO Pages", href: "/admin/seo/pages", icon: Layers },
   { name: "SEO Quick (Brands)", href: "/admin/seo/quick/brands", icon: Tag },
   { name: "SEO Quick (Manufacturers)", href: "/admin/seo/quick/manufacturers", icon: Layers },
