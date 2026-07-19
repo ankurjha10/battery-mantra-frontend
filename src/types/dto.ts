@@ -53,8 +53,16 @@ export type CreateManufacturerRequest = {
 };
 export type UpdateManufacturerRequest = Partial<CreateManufacturerRequest>;
 
-/* ---------- Vehicles ---------- */
-export type FuelType = "PETROL" | "DIESEL" | "ELECTRIC" | "CNG";
+export type FuelResponse = {
+  fuelId: UUID;
+  fuelName: string;
+  displayOrder?: number;
+};
+export type CreateFuelRequest = {
+  fuelName: string;
+  displayOrder?: number;
+};
+
 export type VehicleType = "CAR" | "BIKE" | "COMMERCIAL" | "E_RICKSHAW" | "INVERTER";
 
 export type VehicleResponse = {
@@ -62,20 +70,30 @@ export type VehicleResponse = {
   vehicleType: VehicleType;
   make: string;
   model: string;
-  yearFrom?: number;
-  yearTo?: number;
-  fuelType?: FuelType;
+  fuelId?: UUID;
+  fuelName?: string;
   imageUrl?: string | null;
   capacity?: string;
+  categoryId?: UUID;
+  manufacturerId?: UUID;
+  description?: string;
+  shortDescription?: string;
+  shortDescriptionDealer?: string;
+  seo?: Record<string, unknown>;
 };
 export type CreateVehicleRequest = {
   vehicleType: VehicleType;
   make: string;
   model: string;
-  yearFrom?: number;
-  yearTo?: number;
-  fuelType?: FuelType;
+  fuelId?: UUID;
   imageUrl?: string;
+  capacity?: string;
+  categoryId?: UUID;
+  manufacturerId?: UUID;
+  description?: string;
+  shortDescription?: string;
+  shortDescriptionDealer?: string;
+  seo?: Record<string, unknown>;
 };
 
 /* ---------- Brands ---------- */

@@ -69,6 +69,7 @@ export const endpoints = {
   admin: {
     users: "/api/admin/users",
     capacities: "/api/admin/capacities",
+    fuels: "/api/fuels",
     orders: "/api/admin/orders",
     upload: "/api/admin/upload",
     updateOrderStatus: (orderId: string) => `/api/admin/orders/${encodeURIComponent(orderId)}/status`,

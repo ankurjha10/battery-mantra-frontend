@@ -30,6 +30,7 @@ import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
 import { Route as AdminManufacturersRouteImport } from './routes/admin.manufacturers'
 import { Route as AdminLocationsRouteImport } from './routes/admin.locations'
+import { Route as AdminFuelsRouteImport } from './routes/admin.fuels'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
 import { Route as AdminCapacitiesRouteImport } from './routes/admin.capacities'
 import { Route as AdminCallbacksRouteImport } from './routes/admin.callbacks'
@@ -151,6 +152,11 @@ const AdminLocationsRoute = AdminLocationsRouteImport.update({
   path: '/locations',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminFuelsRoute = AdminFuelsRouteImport.update({
+  id: '/fuels',
+  path: '/fuels',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
   id: '/categories',
   path: '/categories',
@@ -253,6 +259,7 @@ export interface FileRoutesByFullPath {
   '/admin/callbacks': typeof AdminCallbacksRoute
   '/admin/capacities': typeof AdminCapacitiesRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/fuels': typeof AdminFuelsRoute
   '/admin/locations': typeof AdminLocationsRoute
   '/admin/manufacturers': typeof AdminManufacturersRoute
   '/admin/orders': typeof AdminOrdersRoute
@@ -290,6 +297,7 @@ export interface FileRoutesByTo {
   '/admin/callbacks': typeof AdminCallbacksRoute
   '/admin/capacities': typeof AdminCapacitiesRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/fuels': typeof AdminFuelsRoute
   '/admin/locations': typeof AdminLocationsRoute
   '/admin/manufacturers': typeof AdminManufacturersRoute
   '/admin/orders': typeof AdminOrdersRoute
@@ -330,6 +338,7 @@ export interface FileRoutesById {
   '/admin/callbacks': typeof AdminCallbacksRoute
   '/admin/capacities': typeof AdminCapacitiesRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/fuels': typeof AdminFuelsRoute
   '/admin/locations': typeof AdminLocationsRoute
   '/admin/manufacturers': typeof AdminManufacturersRoute
   '/admin/orders': typeof AdminOrdersRoute
@@ -370,6 +379,7 @@ export interface FileRouteTypes {
     | '/admin/callbacks'
     | '/admin/capacities'
     | '/admin/categories'
+    | '/admin/fuels'
     | '/admin/locations'
     | '/admin/manufacturers'
     | '/admin/orders'
@@ -407,6 +417,7 @@ export interface FileRouteTypes {
     | '/admin/callbacks'
     | '/admin/capacities'
     | '/admin/categories'
+    | '/admin/fuels'
     | '/admin/locations'
     | '/admin/manufacturers'
     | '/admin/orders'
@@ -446,6 +457,7 @@ export interface FileRouteTypes {
     | '/admin/callbacks'
     | '/admin/capacities'
     | '/admin/categories'
+    | '/admin/fuels'
     | '/admin/locations'
     | '/admin/manufacturers'
     | '/admin/orders'
@@ -635,6 +647,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLocationsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/fuels': {
+      id: '/admin/fuels'
+      path: '/fuels'
+      fullPath: '/admin/fuels'
+      preLoaderRoute: typeof AdminFuelsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/categories': {
       id: '/admin/categories'
       path: '/categories'
@@ -768,6 +787,7 @@ interface AdminRouteChildren {
   AdminCallbacksRoute: typeof AdminCallbacksRoute
   AdminCapacitiesRoute: typeof AdminCapacitiesRoute
   AdminCategoriesRoute: typeof AdminCategoriesRoute
+  AdminFuelsRoute: typeof AdminFuelsRoute
   AdminLocationsRoute: typeof AdminLocationsRoute
   AdminManufacturersRoute: typeof AdminManufacturersRoute
   AdminOrdersRoute: typeof AdminOrdersRoute
@@ -790,6 +810,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminCallbacksRoute: AdminCallbacksRoute,
   AdminCapacitiesRoute: AdminCapacitiesRoute,
   AdminCategoriesRoute: AdminCategoriesRoute,
+  AdminFuelsRoute: AdminFuelsRoute,
   AdminLocationsRoute: AdminLocationsRoute,
   AdminManufacturersRoute: AdminManufacturersRoute,
   AdminOrdersRoute: AdminOrdersRoute,

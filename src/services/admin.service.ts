@@ -22,6 +22,8 @@ import type {
   UpdateCallbackStatusRequest,
   CapacityResponse,
   CreateCapacityRequest,
+  FuelResponse,
+  CreateFuelRequest,
   UUID
 } from "@/types/dto";
 
@@ -47,6 +49,16 @@ export const adminService = {
     apiFetch<CapacityResponse>(`${endpoints.admin.capacities}/${id}`, { method: "PUT", body: JSON.stringify(body) }),
   deleteCapacity: (id: UUID) => 
     apiFetch<void>(`${endpoints.admin.capacities}/${id}`, { method: "DELETE" }),
+
+  // Fuels
+  getAllFuels: () => 
+    apiFetch<FuelResponse[]>(endpoints.admin.fuels, { method: "GET" }),
+  createFuel: (body: CreateFuelRequest) => 
+    apiFetch<FuelResponse>(endpoints.admin.fuels, { method: "POST", body: JSON.stringify(body) }),
+  updateFuel: (id: UUID, body: CreateFuelRequest) => 
+    apiFetch<FuelResponse>(`${endpoints.admin.fuels}/${id}`, { method: "PUT", body: JSON.stringify(body) }),
+  deleteFuel: (id: UUID) => 
+    apiFetch<void>(`${endpoints.admin.fuels}/${id}`, { method: "DELETE" }),
 
   // Users
   getAllUsers: () => apiFetch<UserResponse[]>(endpoints.admin.users, { method: "GET" }),

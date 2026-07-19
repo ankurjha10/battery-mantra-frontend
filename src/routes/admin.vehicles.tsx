@@ -15,9 +15,11 @@ import { Trash2, Plus, Edit, Car, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FormField } from "@/components/forms/FormField";
-import { rootCategoriesQuery, capacitiesQuery } from "@/queries";
+import { rootCategoriesQuery, capacitiesQuery, manufacturersListQuery, fuelsQuery } from "@/queries";
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { Checkbox } from "@/components/ui/checkbox";
 import { CloudinaryUpload } from "@/components/admin/CloudinaryUpload";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
@@ -55,9 +57,14 @@ const vehicleSchema = z.object({
   vehicleType: z.enum(["CAR", "BIKE", "COMMERCIAL", "E_RICKSHAW", "INVERTER"]),
   make: z.string().trim().min(1, "Make is required"),
   model: z.string().trim().min(1, "Model is required"),
-  fuelType: z.enum(["PETROL", "DIESEL", "ELECTRIC", "CNG"]).optional(),
+  fuelId: z.string().optional().or(z.literal("")),
   imageUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   capacity: z.string().optional(),
+  categoryId: z.string().optional(),
+  manufacturerId: z.string().optional(),
+  description: z.string().optional(),
+  shortDescription: z.string().optional(),
+  shortDescriptionDealer: z.string().optional(),
   seo: z.object({
     slug: z.string().optional(),
     metaTitle: z.string().optional(),
@@ -102,7 +109,7 @@ const parseCSV = (text: string) => {
       vehicleType: ["CAR", "BIKE", "COMMERCIAL", "E_RICKSHAW", "INVERTER"].includes(vehicleType) ? vehicleType : "CAR",
       make: row.make,
       model: row.model,
-      fuelType: ["PETROL", "DIESEL", "ELECTRIC", "CNG"].includes(fuelType) ? fuelType : undefined,
+      fuelId: row.fuelId || undefined,
       imageUrl: row.imageUrl || undefined,
       capacity: row.capacity || undefined,
     });
@@ -115,6 +122,8 @@ function AdminVehicles() {
   const { data: vehicles, isLoading } = useQuery(vehiclesListQuery());
   const { data: rootCategories = [] } = useQuery(rootCategoriesQuery());
   const { data: dbCapacities = [] } = useQuery(capacitiesQuery());
+  const { data: manufacturers = [] } = useQuery(manufacturersListQuery());
+  const { data: dbFuels = [] } = useQuery(fuelsQuery());
   
   const [activeTab, setActiveTab] = useState("ALL");
   const [activeMake, setActiveMake] = useState("ALL");
@@ -157,9 +166,14 @@ function AdminVehicles() {
       vehicleType: "CAR",
       make: "",
       model: "",
-      fuelType: undefined,
+      fuelId: "",
       imageUrl: "",
       capacity: "",
+      categoryId: "",
+      manufacturerId: "",
+      description: "",
+      shortDescription: "",
+      shortDescriptionDealer: "",
       seo: {
         slug: "",
         metaTitle: "",
@@ -184,9 +198,14 @@ function AdminVehicles() {
       vehicleType: vehicle.vehicleType || "CAR",
       make: vehicle.make,
       model: vehicle.model,
-      fuelType: vehicle.fuelType,
+      fuelId: vehicle.fuelId || "",
       imageUrl: vehicle.imageUrl || "",
       capacity: vehicle.capacity || "",
+      categoryId: vehicle.categoryId || "",
+      manufacturerId: vehicle.manufacturerId || "",
+      description: vehicle.description || "",
+      shortDescription: vehicle.shortDescription || "",
+      shortDescriptionDealer: vehicle.shortDescriptionDealer || "",
       seo: vehicle.seo || {
         slug: "",
         metaTitle: "",
@@ -245,9 +264,14 @@ function AdminVehicles() {
       vehicleType: values.vehicleType,
       make: values.make,
       model: values.model,
-      fuelType: values.fuelType,
+      fuelId: values.fuelId || undefined,
       imageUrl: values.imageUrl || undefined,
       capacity: values.capacity || undefined,
+      categoryId: values.categoryId || undefined,
+      manufacturerId: values.manufacturerId || undefined,
+      description: values.description || undefined,
+      shortDescription: values.shortDescription || undefined,
+      shortDescriptionDealer: values.shortDescriptionDealer || undefined,
       seo: values.seo,
     };
 
@@ -402,7 +426,7 @@ function AdminVehicles() {
                     </TableCell>
                     <TableCell className="font-medium">{vehicle.make}</TableCell>
                     <TableCell>{vehicle.model}</TableCell>
-                    <TableCell>{vehicle.fuelType || "Any"}</TableCell>
+                    <TableCell>{vehicle.fuelName || "N/A"}</TableCell>
                     <TableCell>{vehicle.capacity || "-"}</TableCell>
                     <TableCell className="text-right">
                       <Button variant="ghost" size="icon" onClick={() => openEditModal(vehicle)}>
@@ -472,10 +496,10 @@ function AdminVehicles() {
                       </span>
                     </div>
                     <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                      {vehicle.fuelType && (
-                        <span className="text-xs text-muted-foreground">{vehicle.fuelType}</span>
+                      {vehicle.fuelName && (
+                        <span className="text-xs text-muted-foreground">{vehicle.fuelName}</span>
                       )}
-                      {vehicle.fuelType && vehicle.capacity && <span className="text-muted-foreground text-xs">•</span>}
+                      {vehicle.fuelName && vehicle.capacity && <span className="text-muted-foreground text-xs">•</span>}
                       {vehicle.capacity && (
                         <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
                           {vehicle.capacity}
@@ -557,56 +581,117 @@ function AdminVehicles() {
           </DialogHeader>
           <form onSubmit={onSubmit} className="space-y-4 pt-4">
             <div className="grid grid-cols-2 gap-4">
-              <FormField label="Vehicle Type" htmlFor="vehicleType" required error={form.formState.errors.vehicleType?.message}>
-                <select
-                  id="vehicleType"
-                  {...form.register("vehicleType")}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <option value="CAR">Car (Four Wheeler)</option>
-                  <option value="BIKE">Bike (Two Wheeler)</option>
-                  <option value="COMMERCIAL">Commercial</option>
-                  <option value="E_RICKSHAW">E-Rickshaw</option>
-                  <option value="INVERTER">Inverter</option>
-                </select>
+              <FormField label="Category" htmlFor="categoryId" required error={form.formState.errors.categoryId?.message}>
+                <Select onValueChange={(val) => form.setValue("categoryId", val)}>
+                  <SelectTrigger className={form.formState.errors.categoryId ? "border-red-500" : ""}>
+                    <SelectValue placeholder="Select a category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {rootCategories.map((c) => (
+                      <SelectItem key={c.categoryId} value={c.categoryId}>{c.categoryName}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </FormField>
 
-              <FormField label="Make" htmlFor="make" required error={form.formState.errors.make?.message}>
-                <Input id="make" {...form.register("make")} placeholder="e.g. Maruti Suzuki, Exide" />
+              <FormField label="Manufacturer" htmlFor="manufacturerId" required error={form.formState.errors.manufacturerId?.message}>
+                <Select onValueChange={(val) => form.setValue("manufacturerId", val)}>
+                  <SelectTrigger className={form.formState.errors.manufacturerId ? "border-red-500" : ""}>
+                    <SelectValue placeholder="Select a manufacturer" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {manufacturers.map((m) => (
+                      <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </FormField>
             </div>
 
-            <FormField label="Model" htmlFor="model" required error={form.formState.errors.model?.message}>
-              <Input id="model" {...form.register("model")} placeholder="e.g. Swift Dzire LDI, 150Ah Tubular" />
-            </FormField>
+            <div className="grid grid-cols-2 gap-4">
+              <FormField label="Make" htmlFor="make" required error={form.formState.errors.make?.message}>
+                <Input id="make" {...form.register("make")} placeholder="e.g. Maruti Suzuki, Exide" />
+              </FormField>
+              <FormField label="Model (Name)" htmlFor="model" required error={form.formState.errors.model?.message}>
+                <Input id="model" {...form.register("model")} placeholder="e.g. Swift Dzire LDI, 150Ah Tubular" />
+              </FormField>
+            </div>
 
-            <FormField label="Fuel Type (Optional)" htmlFor="fuelType" error={form.formState.errors.fuelType?.message}>
+            <FormField label="Vehicle Type" htmlFor="vehicleType" required error={form.formState.errors.vehicleType?.message}>
               <select
-                id="fuelType"
-                {...form.register("fuelType")}
+                id="vehicleType"
+                {...form.register("vehicleType")}
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                <option value="">None / Not Applicable</option>
-                <option value="PETROL">Petrol</option>
-                <option value="DIESEL">Diesel</option>
-                <option value="CNG">CNG</option>
-                <option value="ELECTRIC">Electric</option>
+                <option value="CAR">Car (Four Wheeler)</option>
+                <option value="BIKE">Bike (Two Wheeler)</option>
+                <option value="COMMERCIAL">Commercial</option>
+                <option value="E_RICKSHAW">E-Rickshaw</option>
+                <option value="INVERTER">Inverter</option>
               </select>
             </FormField>
 
-            {(() => {
-              const vType = form.watch("vehicleType");
-              let catName = "";
-              if (vType === "CAR") catName = "Four Wheeler";
-              else if (vType === "BIKE") catName = "Two Wheeler";
-              else if (vType === "GENERATOR") catName = "Generator";
+            <FormField label="Fuel Type" htmlFor="fuelId" error={form.formState.errors.fuelId?.message}>
+              <Controller
+                control={form.control}
+                name="fuelId"
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger id="fuelId" className={form.formState.errors.fuelId ? "border-red-500" : ""}>
+                      <SelectValue placeholder="Select Fuel Type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {dbFuels.map((fuel) => (
+                        <SelectItem key={fuel.fuelId} value={fuel.fuelId}>{fuel.fuelName}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </FormField>
 
+            <div className="space-y-6 pt-4 border-t">
+              <div className="space-y-2">
+                <Label>Description</Label>
+                <Controller
+                  name="description"
+                  control={form.control}
+                  render={({ field }) => (
+                    <RichTextEditor value={field.value || ""} onChange={field.onChange} placeholder="Detailed description..." />
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Short Description (Normal)</Label>
+                  <Controller
+                    name="shortDescription"
+                    control={form.control}
+                    render={({ field }) => (
+                      <RichTextEditor value={field.value || ""} onChange={field.onChange} placeholder="Short Description..." />
+                    )}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Short Description (Dealer)</Label>
+                  <Controller
+                    name="shortDescriptionDealer"
+                    control={form.control}
+                    render={({ field }) => (
+                      <RichTextEditor value={field.value || ""} onChange={field.onChange} placeholder="Short Description for dealers..." />
+                    )}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {(() => {
+              const selectedCategoryId = form.watch("categoryId");
               let options = dbCapacities;
-              if (catName) {
-                const cat = rootCategories.find(c => c.categoryName.toLowerCase().includes(catName.toLowerCase()));
-                if (cat) {
-                  options = dbCapacities.filter(c => c.categoryId === cat.categoryId);
-                }
+              
+              if (selectedCategoryId) {
+                options = dbCapacities.filter(c => c.categoryId === selectedCategoryId);
               }
 
               if (options.length === 0) return null;

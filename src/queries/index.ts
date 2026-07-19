@@ -66,6 +66,13 @@ export const capacitiesQuery = (categoryId?: string) =>
     staleTime: 5 * 60_000,
   });
 
+export const fuelsQuery = () =>
+  queryOptions({
+    queryKey: ["admin", "fuels"],
+    queryFn: () => adminService.getAllFuels(),
+    staleTime: 5 * 60_000,
+  });
+
 export const manufacturersListQuery = () =>
   queryOptions({
     queryKey: queryKeys.manufacturers.list(),
