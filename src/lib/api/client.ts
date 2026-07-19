@@ -81,6 +81,7 @@ export async function apiFetch<T = unknown>(path: string, opts: RequestOptions =
       body: payload,
       signal: controller.signal,
       credentials: "omit",
+      cache: "no-store",
     });
   } catch (e) {
     clearTimeout(timer);

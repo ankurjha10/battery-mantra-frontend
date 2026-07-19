@@ -82,7 +82,7 @@ function AdminFuels() {
   const addMutation = useMutation({
     mutationFn: (data: CreateFuelRequest) => adminService.createFuel(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["fuels"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "fuels"] });
       toast.success("Fuel created successfully");
       closeModal();
     },
@@ -92,7 +92,7 @@ function AdminFuels() {
   const editMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: CreateFuelRequest }) => adminService.updateFuel(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["fuels"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "fuels"] });
       toast.success("Fuel updated successfully");
       closeModal();
     },
@@ -102,7 +102,7 @@ function AdminFuels() {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => adminService.deleteFuel(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["fuels"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "fuels"] });
       toast.success("Fuel deleted successfully");
     },
     onError: (e) => toast.error(e instanceof ApiError ? e.message : "Failed to delete fuel"),
