@@ -145,8 +145,8 @@ function AdminDeliveryTime() {
           </thead>
           <tbody>
             {categories.map((category) => (
-              <tr key={category.categoryId} className="border-b last:border-0 hover:bg-muted/30 transition-colors group">
-                <td className="px-4 py-3 font-medium sticky left-0 bg-card group-hover:bg-muted/10 z-10 border-r shadow-[1px_0_0_0_rgba(0,0,0,0.05)]">
+              <tr key={category.categoryId} className="border-b last:border-0 hover:bg-muted transition-colors group">
+                <td className="px-4 py-3 font-medium sticky left-0 bg-card group-hover:bg-muted z-10 border-r shadow-[1px_0_0_0_rgba(0,0,0,0.05)]">
                   {category.categoryName}
                 </td>
                 {cities.map((city) => {
