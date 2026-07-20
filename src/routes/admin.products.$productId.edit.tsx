@@ -24,9 +24,9 @@ const formSchema = z.object({
   productName: z.string().min(2, "Name is required"),
   productDescription: z.string().optional(),
   productPrice: z.coerce.number().min(0, "Price must be positive"),
-  originalPrice: z.coerce.number().min(0).optional(),
-  exchangePrice: z.coerce.number().min(0).optional().default(0),
-  productStock: z.coerce.number().min(0).optional(),
+  originalPrice: z.coerce.number().min(0).optional().default(0),
+  exchangeDiscount: z.coerce.number().min(0).optional().default(0),
+  productStock: z.coerce.number().min(0).optional().default(0),
   productImage: z.string().min(1, "Primary image URL is required"),
   additionalImages: z.array(z.object({
     url: z.string().url("Must be a valid URL")
@@ -89,7 +89,7 @@ function EditProductPage() {
     productDescription: product.productDescription || "",
     productPrice: product.productPrice,
     originalPrice: Number(product.specs?.originalPrice || 0),
-    exchangePrice: product.exchangeDiscount && product.exchangeDiscount > 0 ? product.productPrice - product.exchangeDiscount : 0,
+    exchangeDiscount: product.exchangeDiscount || 0,
     productStock: product.productStock || 0,
     productImage: product.productImage || "",
     additionalImages: product.additionalImages?.map(url => ({ url })) || [],
@@ -253,7 +253,7 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
       productName: data.productName,
       productDescription: data.productDescription || undefined,
       productPrice: data.productPrice,
-      exchangeDiscount: data.exchangePrice && data.exchangePrice > 0 && data.exchangePrice < data.productPrice ? data.productPrice - data.exchangePrice : 0,
+      exchangeDiscount: data.exchangeDiscount || 0,
       productStock: data.productStock,
       productImage: data.productImage || undefined,
       additionalImages: data.additionalImages.length > 0 ? data.additionalImages.map(img => img.url).filter(Boolean) : undefined,
@@ -455,10 +455,10 @@ function EditProductForm({ productId, defaultValues }: { productId: string; defa
                 <p className="text-xs text-muted-foreground">Strikethrough price. Leave 0 if none.</p>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="exchangePrice">Price with Exchange (₹)</Label>
-                <Input id="exchangePrice" type="number" min="0" step="1" {...form.register("exchangePrice")} placeholder="Final price after exchange" />
-                <p className="text-[10px] text-muted-foreground mt-1">Leave as 0 if no exchange is offered.</p>
-                {form.formState.errors.exchangePrice && <p className="text-xs text-red-500">{form.formState.errors.exchangePrice.message}</p>}
+                <Label htmlFor="exchangeDiscount">Price Old Item (Rs.)</Label>
+                <Input id="exchangeDiscount" type="number" min="0" step="1" {...form.register("exchangeDiscount")} placeholder="Exchange discount" />
+                <p className="text-[10px] text-muted-foreground mt-1">Discount amount for old battery (Scrap Value).</p>
+                {form.formState.errors.exchangeDiscount && <p className="text-xs text-red-500">{form.formState.errors.exchangeDiscount.message}</p>}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="productStock">Stock Quantity</Label>
