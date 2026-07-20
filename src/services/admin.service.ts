@@ -27,6 +27,33 @@ import type {
   UUID
 } from "@/types/dto";
 
+export interface AdminCreateCustomerRequest {
+  name: string;
+  phone: string;
+  email?: string;
+  addressLine1: string;
+  addressLine2?: string;
+  city: string;
+  state: string;
+  pincode: string;
+}
+
+export interface AdminOrderItemRequest {
+  productId: string;
+  quantity: number;
+  exchangeOldBattery: boolean;
+}
+
+export interface AdminCreateOrderRequest {
+  customerId: string;
+  addressId?: string;
+  discount?: number;
+  items: AdminOrderItemRequest[];
+  paymentMethod: string;
+  deliveryMethod: string;
+  installationDate?: string;
+}
+
 export const adminService = {
   // Upload
   uploadImage: (file: File, folder: string) => {
@@ -60,11 +87,15 @@ export const adminService = {
   deleteFuel: (id: UUID) => 
     apiFetch<void>(`${endpoints.admin.fuels}/${id}`, { method: "DELETE" }),
 
-  // Users
+  // Users & Customers
   getAllUsers: () => apiFetch<UserResponse[]>(endpoints.admin.users, { method: "GET" }),
+  createCustomer: (body: AdminCreateCustomerRequest) => 
+    apiFetch<UserResponse>("/api/admin/customers", { method: "POST", body }),
 
   // Orders
   getAllOrders: () => apiFetch<OrderResponse[]>(endpoints.admin.orders, { method: "GET" }),
+  createOrder: (body: AdminCreateOrderRequest) => 
+    apiFetch<OrderResponse>("/api/admin/orders", { method: "POST", body }),
   updateOrderStatus: (orderId: UUID, body: OrderStatusUpdateRequest) => 
     apiFetch<OrderResponse>(endpoints.admin.updateOrderStatus(orderId), { method: "PATCH", body }),
 
