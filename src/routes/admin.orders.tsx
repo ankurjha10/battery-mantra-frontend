@@ -353,11 +353,11 @@ function AdminOrders() {
           <p className="text-muted-foreground mt-1">Review, process and update customer orders.</p>
         </div>
         <div className="flex gap-3 w-full sm:w-auto">
-          <Button variant="default" className="shrink-0 font-semibold shadow-sm" asChild>
-            <Link to="/admin/orders/create">
+          <Link to="/admin/orders/create">
+            <Button variant="default" className="shrink-0 font-semibold shadow-sm">
               + Create Order
-            </Link>
-          </Button>
+            </Button>
+          </Link>
           <div className="relative w-full sm:w-72">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
