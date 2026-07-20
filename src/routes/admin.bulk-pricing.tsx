@@ -8,7 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
-import { adminService } from "@/services/admin.service";
+import { categoriesService, brandsService } from "@/services/catalog.service";
+import { locationService } from "@/services/location.service";
 import { bulkPricingService } from "@/services/bulk-pricing.service";
 
 export const Route = createFileRoute("/admin/bulk-pricing")({
@@ -23,17 +24,17 @@ function BulkPricingPage() {
 
   const { data: categories = [], isLoading: loadingCategories } = useQuery({
     queryKey: ["admin", "categories"],
-    queryFn: adminService.getCategories,
+    queryFn: () => categoriesService.list(),
   });
 
   const { data: brands = [], isLoading: loadingBrands } = useQuery({
     queryKey: ["admin", "brands"],
-    queryFn: adminService.getBrands,
+    queryFn: () => brandsService.list(),
   });
 
   const { data: locations = [], isLoading: loadingLocations } = useQuery({
     queryKey: ["admin", "locations"],
-    queryFn: adminService.getLocations,
+    queryFn: () => locationService.getAllCities(),
   });
 
   const { data: matrixData, isLoading: loadingMatrix } = useQuery({
