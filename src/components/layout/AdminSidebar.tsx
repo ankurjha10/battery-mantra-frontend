@@ -31,6 +31,7 @@ const navigation = [
   { name: "Capacities (RL)", href: "/admin/capacities", icon: Layers },
   { name: "Manufacturers", href: "/admin/manufacturers", icon: Layers },
   { name: "Locations", href: "/admin/locations", icon: MapPin },
+  { name: "Delivery Time", href: "/admin/delivery-time", icon: MapPin },
   { name: "Users", href: "/admin/users", icon: Users },
   { name: "Banners", href: "/admin/banners", icon: Image },
   { name: "Callbacks", href: "/admin/callbacks", icon: PhoneCall },

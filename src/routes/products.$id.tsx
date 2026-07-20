@@ -35,7 +35,8 @@ import { cartService } from "@/services/cart.service";
 import { toast } from "sonner";
 import { useNavigate } from "@tanstack/react-router";
 import { useLocationStore } from "@/store/useLocationStore";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Clock } from "lucide-react";
+import { deliveryTimeService } from "@/services/delivery-time.service";
 
 const searchSchema = z.object({
   autoAdd: z.enum(["true", "false"]).optional().catch(undefined),
@@ -98,12 +99,16 @@ function PdpPage() {
 
   const vehicles = useQuery(vehiclesListQuery());
   const displayVehicles = data.capacity 
-    ? vehicles.data?.filter(v => {
-        if (!v.capacity) return false;
-        const vCaps = v.capacity.split(",").map(c => c.trim()).filter(Boolean);
-        return vCaps.includes(data.capacity as string);
-      })
-    : data.compatibleVehicles;
+    ? (vehicles.data || []).filter(v => v.capacityId === data.capacity)
+    : [];
+
+  const { data: deliveryTime, isLoading: isLoadingDeliveryTime } = useQuery({
+    queryKey: ["delivery-time", data.categoryId, city?.cityId],
+    queryFn: () => deliveryTimeService.getDeliveryTime(data.categoryId, city!.cityId),
+    enabled: !!data.categoryId && !!city?.cityId,
+  });
+
+  const inStock = (data.productStock ?? 0) > 0;
 
   useEffect(() => {
     if (data?.productImage && !activeImage) {
@@ -314,6 +319,34 @@ function PdpPage() {
                   </Badge>
                 )}
               </div>
+              
+              {/* Delivery Time Widget */}
+              {city ? (
+                <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg border border-border/50 text-sm">
+                  <div className="bg-primary/10 p-2 rounded-full text-primary shrink-0">
+                    <Clock className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-foreground">Delivery to <span className="text-primary font-semibold">{city.cityName}</span></p>
+                    {isLoadingDeliveryTime ? (
+                      <p className="text-muted-foreground animate-pulse">Calculating delivery time...</p>
+                    ) : (deliveryTime?.days || deliveryTime?.hours) ? (
+                      <p className="text-muted-foreground">
+                        Estimated time: <span className="font-medium text-foreground">{deliveryTime.days ? `${deliveryTime.days} Days` : ''} {deliveryTime.hours ? `${deliveryTime.hours} Hours` : ''}</span>
+                      </p>
+                    ) : (
+                      <p className="text-muted-foreground">Standard delivery time applies.</p>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg border border-border/50 text-sm">
+                  <div className="bg-muted p-2 rounded-full text-muted-foreground shrink-0">
+                    <MapPin className="h-5 w-5" />
+                  </div>
+                  <p className="text-muted-foreground">Please select a location above to see estimated delivery time.</p>
+                </div>
+              )}
             </div>
 
             {/* Key Highlights */}
