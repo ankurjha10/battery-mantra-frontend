@@ -20,9 +20,11 @@ export const Route = createFileRoute("/admin/orders")({
 
 const ORDER_STATUSES: OrderStatus[] = ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED", "RETURNED"];
 
-const ACTION_REQUIRED_STATUSES = ["PENDING", "PROCESSING"];
-const IN_TRANSIT_STATUSES = ["SHIPPED"];
-const PAST_STATUSES = ["DELIVERED", "CANCELLED", "RETURNED"];
+const STATUS_NEW = ["PENDING"];
+const STATUS_READY = ["PROCESSING"];
+const STATUS_DISPATCHED = ["SHIPPED"];
+const STATUS_DELIVERED = ["DELIVERED"];
+const STATUS_CANCELLED = ["CANCELLED", "RETURNED"];
 
 function AdminOrders() {
   const queryClient = useQueryClient();
@@ -56,11 +58,14 @@ function AdminOrders() {
     (o.shippingAddress && o.shippingAddress.toLowerCase().includes(search.toLowerCase()))
   );
 
-  const actionRequiredOrders = filteredOrders.filter((o) => ACTION_REQUIRED_STATUSES.includes(o.orderStatus));
-  const inTransitOrders = filteredOrders.filter((o) => IN_TRANSIT_STATUSES.includes(o.orderStatus));
-  const pastOrders = filteredOrders.filter((o) => PAST_STATUSES.includes(o.orderStatus));
+  const newOrders = filteredOrders.filter((o) => STATUS_NEW.includes(o.orderStatus));
+  const readyOrders = filteredOrders.filter((o) => STATUS_READY.includes(o.orderStatus));
+  const dispatchedOrders = filteredOrders.filter((o) => STATUS_DISPATCHED.includes(o.orderStatus));
+  const deliveredOrders = filteredOrders.filter((o) => STATUS_DELIVERED.includes(o.orderStatus));
+  const cancelledOrders = filteredOrders.filter((o) => STATUS_CANCELLED.includes(o.orderStatus));
+  const allOrders = filteredOrders;
 
-  const pendingCount = actionRequiredOrders.filter(o => o.orderStatus === "PENDING").length;
+  const pendingCount = newOrders.length;
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -347,48 +352,68 @@ function AdminOrders() {
           <h2 className="font-display text-3xl font-bold tracking-tight">Order Management</h2>
           <p className="text-muted-foreground mt-1">Review, process and update customer orders.</p>
         </div>
-        <div className="relative w-full sm:w-72">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search Order ID or City..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 bg-card"
-          />
+        <div className="flex gap-3 w-full sm:w-auto">
+          <Button variant="default" className="shrink-0 font-semibold shadow-sm">
+            + Create Order
+          </Button>
+          <div className="relative w-full sm:w-72">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search Order ID or City..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-9 bg-card"
+            />
+          </div>
         </div>
       </div>
 
-      <Tabs defaultValue="action" className="w-full">
-        <TabsList className="mb-6 grid w-full grid-cols-3 max-w-lg h-auto p-1 bg-muted/60">
-          <TabsTrigger value="action" className="py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
-            Action Required
-            {pendingCount > 0 && (
-              <span className="ml-2 inline-flex items-center justify-center rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-bold text-white">
-                {pendingCount}
-              </span>
-            )}
-          </TabsTrigger>
-          <TabsTrigger value="transit" className="py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
-            In Transit
-            {inTransitOrders.length > 0 && (
-              <span className="ml-2 text-xs font-medium text-muted-foreground">({inTransitOrders.length})</span>
-            )}
-          </TabsTrigger>
-          <TabsTrigger value="past" className="py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-sm">
-            Past Orders
-          </TabsTrigger>
-        </TabsList>
+      <Tabs defaultValue="new" className="w-full">
+        <div className="overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
+          <TabsList className="mb-6 inline-flex min-w-max h-auto p-1 bg-muted/60 rounded-xl">
+            <TabsTrigger value="new" className="py-2.5 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              New Orders
+              {pendingCount > 0 && (
+                <span className="ml-2 inline-flex items-center justify-center rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-bold text-white">
+                  {pendingCount}
+                </span>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="ready" className="py-2.5 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              Ready For Dispatch
+            </TabsTrigger>
+            <TabsTrigger value="dispatched" className="py-2.5 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              Dispatched
+            </TabsTrigger>
+            <TabsTrigger value="delivered" className="py-2.5 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              Delivered
+            </TabsTrigger>
+            <TabsTrigger value="cancelled" className="py-2.5 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              Cancelled
+            </TabsTrigger>
+            <TabsTrigger value="all" className="py-2.5 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+              All Orders
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
-        <TabsContent value="action" className="mt-0 outline-none">
-          <OrderTable data={actionRequiredOrders} />
+        <TabsContent value="new" className="m-0 focus-visible:outline-none focus-visible:ring-0">
+          <OrderTable data={newOrders} />
         </TabsContent>
-
-        <TabsContent value="transit" className="mt-0 outline-none">
-          <OrderTable data={inTransitOrders} />
+        <TabsContent value="ready" className="m-0 focus-visible:outline-none focus-visible:ring-0">
+          <OrderTable data={readyOrders} />
         </TabsContent>
-
-        <TabsContent value="past" className="mt-0 outline-none">
-          <OrderTable data={pastOrders} />
+        <TabsContent value="dispatched" className="m-0 focus-visible:outline-none focus-visible:ring-0">
+          <OrderTable data={dispatchedOrders} />
+        </TabsContent>
+        <TabsContent value="delivered" className="m-0 focus-visible:outline-none focus-visible:ring-0">
+          <OrderTable data={deliveredOrders} />
+        </TabsContent>
+        <TabsContent value="cancelled" className="m-0 focus-visible:outline-none focus-visible:ring-0">
+          <OrderTable data={cancelledOrders} />
+        </TabsContent>
+        <TabsContent value="all" className="m-0 focus-visible:outline-none focus-visible:ring-0">
+          <OrderTable data={allOrders} />
         </TabsContent>
       </Tabs>
 
