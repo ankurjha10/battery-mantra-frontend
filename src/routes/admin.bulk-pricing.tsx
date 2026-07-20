@@ -155,14 +155,19 @@ function BulkPricingPage() {
         </CardContent>
       </Card>
 
-      {selectedCategory && selectedBrand && (
-        <Card>
-          <CardHeader>
-            <CardTitle>City Markup Matrix</CardTitle>
-            <CardDescription>Enter the percentage (e.g., 115 for 115%) to apply to the base price.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {loadingMatrix ? (
+      <Card>
+        <CardHeader>
+          <CardTitle>City Markup Matrix</CardTitle>
+          <CardDescription>Enter the percentage (e.g., 115 for 115%) to apply to the base price.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {!(selectedCategory && selectedBrand) ? (
+            <div className="flex justify-center items-center p-12 border-2 border-dashed rounded-lg bg-muted/20">
+              <p className="text-muted-foreground text-center">
+                Please select both a <strong>Category</strong> and a <strong>Brand</strong> from the dropdowns above to view the pricing matrix.
+              </p>
+            </div>
+          ) : loadingMatrix ? (
               <div className="flex justify-center p-8">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
               </div>
@@ -219,8 +224,7 @@ function BulkPricingPage() {
               </div>
             )}
           </CardContent>
-        </Card>
-      )}
+      </Card>
     </div>
   );
 }
