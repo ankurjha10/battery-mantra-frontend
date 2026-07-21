@@ -5,13 +5,15 @@ import TextAlign from '@tiptap/extension-text-align';
 import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
 import { Button } from './button';
+import { Input } from './input';
+import { Popover, PopoverContent, PopoverTrigger } from './popover';
 import {
   Bold, Italic, Underline as UnderlineIcon, Strikethrough,
   List, ListOrdered, Link as LinkIcon, ImageIcon,
-  AlignLeft, AlignCenter, AlignRight, AlignJustify
+  AlignLeft, AlignCenter, AlignRight
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface RichTextEditorProps {
   value: string;
@@ -21,6 +23,11 @@ interface RichTextEditorProps {
 }
 
 export function RichTextEditor({ value, onChange, placeholder, className }: RichTextEditorProps) {
+  const [linkUrl, setLinkUrl] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
+  const [isLinkOpen, setIsLinkOpen] = useState(false);
+  const [isImageOpen, setIsImageOpen] = useState(false);
+
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -61,28 +68,22 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
     return null;
   }
 
-  const setLink = () => {
-    const previousUrl = editor.getAttributes('link').href;
-    const url = window.prompt('URL', previousUrl);
-
-    if (url === null) {
-      return;
-    }
-
-    if (url === '') {
+  const handleSetLink = () => {
+    if (linkUrl === '') {
       editor.chain().focus().extendMarkRange('link').unsetLink().run();
-      return;
+    } else {
+      editor.chain().focus().extendMarkRange('link').setLink({ href: linkUrl }).run();
     }
-
-    editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+    setIsLinkOpen(false);
+    setLinkUrl('');
   };
 
-  const addImage = () => {
-    const url = window.prompt('Image URL');
-
-    if (url) {
-      editor.chain().focus().setImage({ src: url }).run();
+  const handleAddImage = () => {
+    if (imageUrl) {
+      editor.chain().focus().setImage({ src: imageUrl }).run();
     }
+    setIsImageOpen(false);
+    setImageUrl('');
   };
 
   return (
@@ -131,12 +132,50 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
         <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().toggleOrderedList().run()} className={cn("h-8 w-8 p-0", editor.isActive('orderedList') && "bg-muted text-foreground")}>
           <ListOrdered className="h-4 w-4" />
         </Button>
-        <Button type="button" variant="ghost" size="sm" onClick={setLink} className={cn("h-8 w-8 p-0", editor.isActive('link') && "bg-muted text-foreground")}>
-          <LinkIcon className="h-4 w-4" />
-        </Button>
-        <Button type="button" variant="ghost" size="sm" onClick={addImage} className="h-8 w-8 p-0">
-          <ImageIcon className="h-4 w-4" />
-        </Button>
+        
+        {/* Link Popover */}
+        <Popover open={isLinkOpen} onOpenChange={(open) => {
+          setIsLinkOpen(open);
+          if (open) setLinkUrl(editor.getAttributes('link').href || '');
+        }}>
+          <PopoverTrigger asChild>
+            <Button type="button" variant="ghost" size="sm" className={cn("h-8 w-8 p-0", editor.isActive('link') && "bg-muted text-foreground")}>
+              <LinkIcon className="h-4 w-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-80 p-3" align="start">
+            <div className="flex space-x-2">
+              <Input
+                placeholder="https://example.com"
+                value={linkUrl}
+                onChange={(e) => setLinkUrl(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleSetLink(); }}
+              />
+              <Button onClick={handleSetLink}>Save</Button>
+            </div>
+          </PopoverContent>
+        </Popover>
+
+        {/* Image Popover */}
+        <Popover open={isImageOpen} onOpenChange={setIsImageOpen}>
+          <PopoverTrigger asChild>
+            <Button type="button" variant="ghost" size="sm" className="h-8 w-8 p-0">
+              <ImageIcon className="h-4 w-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-80 p-3" align="start">
+            <div className="flex space-x-2">
+              <Input
+                placeholder="https://example.com/image.jpg"
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleAddImage(); }}
+              />
+              <Button onClick={handleAddImage}>Add</Button>
+            </div>
+          </PopoverContent>
+        </Popover>
+
       </div>
       <EditorContent editor={editor} className="[&>div]:outline-none" />
     </div>
