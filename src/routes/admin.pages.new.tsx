@@ -1,0 +1,157 @@
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { cmsService, CreateCmsPageRequest } from "@/services/cms.service";
+import { useForm, Controller } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { toast } from "sonner";
+import { ArrowLeft } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+
+export const Route = createFileRoute("/admin/pages/new")({
+  component: NewPage,
+});
+
+function NewPage() {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const { register, handleSubmit, control, formState: { errors }, watch } = useForm<CreateCmsPageRequest>({
+    defaultValues: {
+      title: "",
+      content: "",
+      isActive: true,
+      seo: {
+        slug: "",
+        metaTitle: "",
+        metaDescription: "",
+      }
+    },
+  });
+
+  const titleValue = watch("title");
+
+  const mutation = useMutation({
+    mutationFn: cmsService.createPage,
+    onSuccess: () => {
+      toast.success("Page created successfully");
+      queryClient.invalidateQueries({ queryKey: ["admin", "cms-pages"] });
+      navigate({ to: "/admin/pages" });
+    },
+    onError: () => {
+      toast.error("Failed to create page");
+    },
+  });
+
+  const onSubmit = (data: CreateCmsPageRequest) => {
+    // Auto generate slug if empty
+    if (!data.seo?.slug && data.title) {
+      if (!data.seo) data.seo = {};
+      data.seo.slug = data.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "");
+    }
+    mutation.mutate(data);
+  };
+
+  return (
+    <div className="space-y-6 max-w-4xl mx-auto p-4">
+      <div className="flex items-center space-x-4">
+        <Button variant="ghost" size="icon" onClick={() => navigate({ to: "/admin/pages" })}>
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+        <div>
+          <h2 className="font-display text-3xl font-bold tracking-tight">Create New Page</h2>
+          <p className="text-muted-foreground">Add a new dynamic CMS page to your website.</p>
+        </div>
+      </div>
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>General Information</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-2">
+              <Label htmlFor="title">Page Title *</Label>
+              <Input
+                id="title"
+                {...register("title", { required: "Title is required" })}
+                placeholder="e.g. About Us"
+              />
+              {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="content">Content</Label>
+              <Controller
+                control={control}
+                name="content"
+                render={({ field }) => (
+                  <RichTextEditor
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Write your page content here..."
+                  />
+                )}
+              />
+            </div>
+
+            <div className="flex items-center space-x-2 pt-4">
+              <Controller
+                control={control}
+                name="isActive"
+                render={({ field }) => (
+                  <Switch
+                    id="isActive"
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                )}
+              />
+              <Label htmlFor="isActive">Active (Visible to public)</Label>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>SEO Settings</CardTitle>
+            <CardDescription>Optimize this page for search engines</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-2">
+              <Label htmlFor="seo.slug">URL Slug</Label>
+              <Input
+                id="seo.slug"
+                {...register("seo.slug")}
+                placeholder={titleValue ? titleValue.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "") : "e.g. about-us"}
+              />
+              <p className="text-xs text-muted-foreground">Leave empty to auto-generate from title. (e.g. /p/your-slug)</p>
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="seo.metaTitle">Meta Title</Label>
+              <Input id="seo.metaTitle" {...register("seo.metaTitle")} placeholder="Default uses Page Title" />
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="seo.metaDescription">Meta Description</Label>
+              <Input id="seo.metaDescription" {...register("seo.metaDescription")} />
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="flex justify-end gap-4">
+          <Button type="button" variant="outline" onClick={() => navigate({ to: "/admin/pages" })}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={mutation.isPending}>
+            {mutation.isPending ? "Saving..." : "Save Page"}
+          </Button>
+        </div>
+      </form>
+    </div>
+  );
+}

@@ -10,20 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VehicleFinderRouteImport } from './routes/vehicle-finder'
-import { Route as TermsAndConditionsRouteImport } from './routes/terms-and-conditions'
-import { Route as ShippingAndReplacementRouteImport } from './routes/shipping-and-replacement'
-import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AccountRouteImport } from './routes/account'
-import { Route as AboutUsRouteImport } from './routes/about-us'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductsIndexRouteImport } from './routes/products.index'
 import { Route as OrdersIndexRouteImport } from './routes/orders.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ProductsIdRouteImport } from './routes/products.$id'
+import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as OrdersOrderIdRouteImport } from './routes/orders.$orderId'
 import { Route as AdminVehiclesRouteImport } from './routes/admin.vehicles'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
@@ -40,35 +37,23 @@ import { Route as AdminBannersRouteImport } from './routes/admin.banners'
 import { Route as AuthRegisterRouteImport } from './routes/_auth.register'
 import { Route as AuthLoginRouteImport } from './routes/_auth.login'
 import { Route as AdminProductsIndexRouteImport } from './routes/admin.products.index'
+import { Route as AdminPagesIndexRouteImport } from './routes/admin.pages.index'
 import { Route as AdminOrdersIndexRouteImport } from './routes/admin.orders.index'
 import { Route as ManufacturersCategorySlugMakeSlugRouteImport } from './routes/manufacturers.$categorySlug.$makeSlug'
 import { Route as AdminSeoPagesRouteImport } from './routes/admin.seo.pages'
 import { Route as AdminProductsNewRouteImport } from './routes/admin.products.new'
+import { Route as AdminPagesNewRouteImport } from './routes/admin.pages.new'
 import { Route as AdminOrdersCreateRouteImport } from './routes/admin.orders.create'
 import { Route as AdminSeoQuickProductsRouteImport } from './routes/admin.seo.quick.products'
 import { Route as AdminSeoQuickManufacturersRouteImport } from './routes/admin.seo.quick.manufacturers'
 import { Route as AdminSeoQuickCategoriesRouteImport } from './routes/admin.seo.quick.categories'
 import { Route as AdminSeoQuickBrandsRouteImport } from './routes/admin.seo.quick.brands'
 import { Route as AdminProductsProductIdEditRouteImport } from './routes/admin.products.$productId.edit'
+import { Route as AdminPagesPageIdEditRouteImport } from './routes/admin.pages.$pageId.edit'
 
 const VehicleFinderRoute = VehicleFinderRouteImport.update({
   id: '/vehicle-finder',
   path: '/vehicle-finder',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TermsAndConditionsRoute = TermsAndConditionsRouteImport.update({
-  id: '/terms-and-conditions',
-  path: '/terms-and-conditions',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ShippingAndReplacementRoute = ShippingAndReplacementRouteImport.update({
-  id: '/shipping-and-replacement',
-  path: '/shipping-and-replacement',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
-  id: '/privacy-policy',
-  path: '/privacy-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CheckoutRoute = CheckoutRouteImport.update({
@@ -89,11 +74,6 @@ const AdminRoute = AdminRouteImport.update({
 const AccountRoute = AccountRouteImport.update({
   id: '/account',
   path: '/account',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AboutUsRoute = AboutUsRouteImport.update({
-  id: '/about-us',
-  path: '/about-us',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -123,6 +103,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const ProductsIdRoute = ProductsIdRouteImport.update({
   id: '/products/$id',
   path: '/products/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PSlugRoute = PSlugRouteImport.update({
+  id: '/p/$slug',
+  path: '/p/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OrdersOrderIdRoute = OrdersOrderIdRouteImport.update({
@@ -205,6 +190,11 @@ const AdminProductsIndexRoute = AdminProductsIndexRouteImport.update({
   path: '/products/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminPagesIndexRoute = AdminPagesIndexRouteImport.update({
+  id: '/pages/',
+  path: '/pages/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminOrdersIndexRoute = AdminOrdersIndexRouteImport.update({
   id: '/orders/',
   path: '/orders/',
@@ -224,6 +214,11 @@ const AdminSeoPagesRoute = AdminSeoPagesRouteImport.update({
 const AdminProductsNewRoute = AdminProductsNewRouteImport.update({
   id: '/products/new',
   path: '/products/new',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPagesNewRoute = AdminPagesNewRouteImport.update({
+  id: '/pages/new',
+  path: '/pages/new',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminOrdersCreateRoute = AdminOrdersCreateRouteImport.update({
@@ -258,17 +253,18 @@ const AdminProductsProductIdEditRoute =
     path: '/products/$productId/edit',
     getParentRoute: () => AdminRoute,
   } as any)
+const AdminPagesPageIdEditRoute = AdminPagesPageIdEditRouteImport.update({
+  id: '/pages/$pageId/edit',
+  path: '/pages/$pageId/edit',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/about-us': typeof AboutUsRoute
   '/account': typeof AccountRoute
   '/admin': typeof AdminRouteWithChildren
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
-  '/privacy-policy': typeof PrivacyPolicyRoute
-  '/shipping-and-replacement': typeof ShippingAndReplacementRoute
-  '/terms-and-conditions': typeof TermsAndConditionsRoute
   '/vehicle-finder': typeof VehicleFinderRoute
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
@@ -285,16 +281,20 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AdminUsersRoute
   '/admin/vehicles': typeof AdminVehiclesRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
+  '/p/$slug': typeof PSlugRoute
   '/products/$id': typeof ProductsIdRoute
   '/admin/': typeof AdminIndexRoute
   '/orders/': typeof OrdersIndexRoute
   '/products/': typeof ProductsIndexRoute
   '/admin/orders/create': typeof AdminOrdersCreateRoute
+  '/admin/pages/new': typeof AdminPagesNewRoute
   '/admin/products/new': typeof AdminProductsNewRoute
   '/admin/seo/pages': typeof AdminSeoPagesRoute
   '/manufacturers/$categorySlug/$makeSlug': typeof ManufacturersCategorySlugMakeSlugRoute
   '/admin/orders/': typeof AdminOrdersIndexRoute
+  '/admin/pages/': typeof AdminPagesIndexRoute
   '/admin/products/': typeof AdminProductsIndexRoute
+  '/admin/pages/$pageId/edit': typeof AdminPagesPageIdEditRoute
   '/admin/products/$productId/edit': typeof AdminProductsProductIdEditRoute
   '/admin/seo/quick/brands': typeof AdminSeoQuickBrandsRoute
   '/admin/seo/quick/categories': typeof AdminSeoQuickCategoriesRoute
@@ -303,13 +303,9 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/about-us': typeof AboutUsRoute
   '/account': typeof AccountRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
-  '/privacy-policy': typeof PrivacyPolicyRoute
-  '/shipping-and-replacement': typeof ShippingAndReplacementRoute
-  '/terms-and-conditions': typeof TermsAndConditionsRoute
   '/vehicle-finder': typeof VehicleFinderRoute
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
@@ -326,16 +322,20 @@ export interface FileRoutesByTo {
   '/admin/users': typeof AdminUsersRoute
   '/admin/vehicles': typeof AdminVehiclesRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
+  '/p/$slug': typeof PSlugRoute
   '/products/$id': typeof ProductsIdRoute
   '/admin': typeof AdminIndexRoute
   '/orders': typeof OrdersIndexRoute
   '/products': typeof ProductsIndexRoute
   '/admin/orders/create': typeof AdminOrdersCreateRoute
+  '/admin/pages/new': typeof AdminPagesNewRoute
   '/admin/products/new': typeof AdminProductsNewRoute
   '/admin/seo/pages': typeof AdminSeoPagesRoute
   '/manufacturers/$categorySlug/$makeSlug': typeof ManufacturersCategorySlugMakeSlugRoute
   '/admin/orders': typeof AdminOrdersIndexRoute
+  '/admin/pages': typeof AdminPagesIndexRoute
   '/admin/products': typeof AdminProductsIndexRoute
+  '/admin/pages/$pageId/edit': typeof AdminPagesPageIdEditRoute
   '/admin/products/$productId/edit': typeof AdminProductsProductIdEditRoute
   '/admin/seo/quick/brands': typeof AdminSeoQuickBrandsRoute
   '/admin/seo/quick/categories': typeof AdminSeoQuickCategoriesRoute
@@ -346,14 +346,10 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_auth': typeof AuthRouteWithChildren
-  '/about-us': typeof AboutUsRoute
   '/account': typeof AccountRoute
   '/admin': typeof AdminRouteWithChildren
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
-  '/privacy-policy': typeof PrivacyPolicyRoute
-  '/shipping-and-replacement': typeof ShippingAndReplacementRoute
-  '/terms-and-conditions': typeof TermsAndConditionsRoute
   '/vehicle-finder': typeof VehicleFinderRoute
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/register': typeof AuthRegisterRoute
@@ -370,16 +366,20 @@ export interface FileRoutesById {
   '/admin/users': typeof AdminUsersRoute
   '/admin/vehicles': typeof AdminVehiclesRoute
   '/orders/$orderId': typeof OrdersOrderIdRoute
+  '/p/$slug': typeof PSlugRoute
   '/products/$id': typeof ProductsIdRoute
   '/admin/': typeof AdminIndexRoute
   '/orders/': typeof OrdersIndexRoute
   '/products/': typeof ProductsIndexRoute
   '/admin/orders/create': typeof AdminOrdersCreateRoute
+  '/admin/pages/new': typeof AdminPagesNewRoute
   '/admin/products/new': typeof AdminProductsNewRoute
   '/admin/seo/pages': typeof AdminSeoPagesRoute
   '/manufacturers/$categorySlug/$makeSlug': typeof ManufacturersCategorySlugMakeSlugRoute
   '/admin/orders/': typeof AdminOrdersIndexRoute
+  '/admin/pages/': typeof AdminPagesIndexRoute
   '/admin/products/': typeof AdminProductsIndexRoute
+  '/admin/pages/$pageId/edit': typeof AdminPagesPageIdEditRoute
   '/admin/products/$productId/edit': typeof AdminProductsProductIdEditRoute
   '/admin/seo/quick/brands': typeof AdminSeoQuickBrandsRoute
   '/admin/seo/quick/categories': typeof AdminSeoQuickCategoriesRoute
@@ -390,14 +390,10 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/about-us'
     | '/account'
     | '/admin'
     | '/cart'
     | '/checkout'
-    | '/privacy-policy'
-    | '/shipping-and-replacement'
-    | '/terms-and-conditions'
     | '/vehicle-finder'
     | '/login'
     | '/register'
@@ -414,16 +410,20 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/vehicles'
     | '/orders/$orderId'
+    | '/p/$slug'
     | '/products/$id'
     | '/admin/'
     | '/orders/'
     | '/products/'
     | '/admin/orders/create'
+    | '/admin/pages/new'
     | '/admin/products/new'
     | '/admin/seo/pages'
     | '/manufacturers/$categorySlug/$makeSlug'
     | '/admin/orders/'
+    | '/admin/pages/'
     | '/admin/products/'
+    | '/admin/pages/$pageId/edit'
     | '/admin/products/$productId/edit'
     | '/admin/seo/quick/brands'
     | '/admin/seo/quick/categories'
@@ -432,13 +432,9 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/about-us'
     | '/account'
     | '/cart'
     | '/checkout'
-    | '/privacy-policy'
-    | '/shipping-and-replacement'
-    | '/terms-and-conditions'
     | '/vehicle-finder'
     | '/login'
     | '/register'
@@ -455,16 +451,20 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/vehicles'
     | '/orders/$orderId'
+    | '/p/$slug'
     | '/products/$id'
     | '/admin'
     | '/orders'
     | '/products'
     | '/admin/orders/create'
+    | '/admin/pages/new'
     | '/admin/products/new'
     | '/admin/seo/pages'
     | '/manufacturers/$categorySlug/$makeSlug'
     | '/admin/orders'
+    | '/admin/pages'
     | '/admin/products'
+    | '/admin/pages/$pageId/edit'
     | '/admin/products/$productId/edit'
     | '/admin/seo/quick/brands'
     | '/admin/seo/quick/categories'
@@ -474,14 +474,10 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_auth'
-    | '/about-us'
     | '/account'
     | '/admin'
     | '/cart'
     | '/checkout'
-    | '/privacy-policy'
-    | '/shipping-and-replacement'
-    | '/terms-and-conditions'
     | '/vehicle-finder'
     | '/_auth/login'
     | '/_auth/register'
@@ -498,16 +494,20 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/vehicles'
     | '/orders/$orderId'
+    | '/p/$slug'
     | '/products/$id'
     | '/admin/'
     | '/orders/'
     | '/products/'
     | '/admin/orders/create'
+    | '/admin/pages/new'
     | '/admin/products/new'
     | '/admin/seo/pages'
     | '/manufacturers/$categorySlug/$makeSlug'
     | '/admin/orders/'
+    | '/admin/pages/'
     | '/admin/products/'
+    | '/admin/pages/$pageId/edit'
     | '/admin/products/$productId/edit'
     | '/admin/seo/quick/brands'
     | '/admin/seo/quick/categories'
@@ -518,16 +518,13 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRouteWithChildren
-  AboutUsRoute: typeof AboutUsRoute
   AccountRoute: typeof AccountRoute
   AdminRoute: typeof AdminRouteWithChildren
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRoute
-  PrivacyPolicyRoute: typeof PrivacyPolicyRoute
-  ShippingAndReplacementRoute: typeof ShippingAndReplacementRoute
-  TermsAndConditionsRoute: typeof TermsAndConditionsRoute
   VehicleFinderRoute: typeof VehicleFinderRoute
   OrdersOrderIdRoute: typeof OrdersOrderIdRoute
+  PSlugRoute: typeof PSlugRoute
   ProductsIdRoute: typeof ProductsIdRoute
   OrdersIndexRoute: typeof OrdersIndexRoute
   ProductsIndexRoute: typeof ProductsIndexRoute
@@ -541,27 +538,6 @@ declare module '@tanstack/react-router' {
       path: '/vehicle-finder'
       fullPath: '/vehicle-finder'
       preLoaderRoute: typeof VehicleFinderRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/terms-and-conditions': {
-      id: '/terms-and-conditions'
-      path: '/terms-and-conditions'
-      fullPath: '/terms-and-conditions'
-      preLoaderRoute: typeof TermsAndConditionsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/shipping-and-replacement': {
-      id: '/shipping-and-replacement'
-      path: '/shipping-and-replacement'
-      fullPath: '/shipping-and-replacement'
-      preLoaderRoute: typeof ShippingAndReplacementRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy-policy': {
-      id: '/privacy-policy'
-      path: '/privacy-policy'
-      fullPath: '/privacy-policy'
-      preLoaderRoute: typeof PrivacyPolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/checkout': {
@@ -590,13 +566,6 @@ declare module '@tanstack/react-router' {
       path: '/account'
       fullPath: '/account'
       preLoaderRoute: typeof AccountRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/about-us': {
-      id: '/about-us'
-      path: '/about-us'
-      fullPath: '/about-us'
-      preLoaderRoute: typeof AboutUsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_auth': {
@@ -639,6 +608,13 @@ declare module '@tanstack/react-router' {
       path: '/products/$id'
       fullPath: '/products/$id'
       preLoaderRoute: typeof ProductsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/p/$slug': {
+      id: '/p/$slug'
+      path: '/p/$slug'
+      fullPath: '/p/$slug'
+      preLoaderRoute: typeof PSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/orders/$orderId': {
@@ -753,6 +729,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminProductsIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/pages/': {
+      id: '/admin/pages/'
+      path: '/pages'
+      fullPath: '/admin/pages/'
+      preLoaderRoute: typeof AdminPagesIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/orders/': {
       id: '/admin/orders/'
       path: '/orders'
@@ -779,6 +762,13 @@ declare module '@tanstack/react-router' {
       path: '/products/new'
       fullPath: '/admin/products/new'
       preLoaderRoute: typeof AdminProductsNewRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/pages/new': {
+      id: '/admin/pages/new'
+      path: '/pages/new'
+      fullPath: '/admin/pages/new'
+      preLoaderRoute: typeof AdminPagesNewRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/orders/create': {
@@ -823,6 +813,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminProductsProductIdEditRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/pages/$pageId/edit': {
+      id: '/admin/pages/$pageId/edit'
+      path: '/pages/$pageId/edit'
+      fullPath: '/admin/pages/$pageId/edit'
+      preLoaderRoute: typeof AdminPagesPageIdEditRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
@@ -853,10 +850,13 @@ interface AdminRouteChildren {
   AdminVehiclesRoute: typeof AdminVehiclesRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminOrdersCreateRoute: typeof AdminOrdersCreateRoute
+  AdminPagesNewRoute: typeof AdminPagesNewRoute
   AdminProductsNewRoute: typeof AdminProductsNewRoute
   AdminSeoPagesRoute: typeof AdminSeoPagesRoute
   AdminOrdersIndexRoute: typeof AdminOrdersIndexRoute
+  AdminPagesIndexRoute: typeof AdminPagesIndexRoute
   AdminProductsIndexRoute: typeof AdminProductsIndexRoute
+  AdminPagesPageIdEditRoute: typeof AdminPagesPageIdEditRoute
   AdminProductsProductIdEditRoute: typeof AdminProductsProductIdEditRoute
   AdminSeoQuickBrandsRoute: typeof AdminSeoQuickBrandsRoute
   AdminSeoQuickCategoriesRoute: typeof AdminSeoQuickCategoriesRoute
@@ -879,10 +879,13 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminVehiclesRoute: AdminVehiclesRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminOrdersCreateRoute: AdminOrdersCreateRoute,
+  AdminPagesNewRoute: AdminPagesNewRoute,
   AdminProductsNewRoute: AdminProductsNewRoute,
   AdminSeoPagesRoute: AdminSeoPagesRoute,
   AdminOrdersIndexRoute: AdminOrdersIndexRoute,
+  AdminPagesIndexRoute: AdminPagesIndexRoute,
   AdminProductsIndexRoute: AdminProductsIndexRoute,
+  AdminPagesPageIdEditRoute: AdminPagesPageIdEditRoute,
   AdminProductsProductIdEditRoute: AdminProductsProductIdEditRoute,
   AdminSeoQuickBrandsRoute: AdminSeoQuickBrandsRoute,
   AdminSeoQuickCategoriesRoute: AdminSeoQuickCategoriesRoute,
@@ -895,16 +898,13 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRouteWithChildren,
-  AboutUsRoute: AboutUsRoute,
   AccountRoute: AccountRoute,
   AdminRoute: AdminRouteWithChildren,
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRoute,
-  PrivacyPolicyRoute: PrivacyPolicyRoute,
-  ShippingAndReplacementRoute: ShippingAndReplacementRoute,
-  TermsAndConditionsRoute: TermsAndConditionsRoute,
   VehicleFinderRoute: VehicleFinderRoute,
   OrdersOrderIdRoute: OrdersOrderIdRoute,
+  PSlugRoute: PSlugRoute,
   ProductsIdRoute: ProductsIdRoute,
   OrdersIndexRoute: OrdersIndexRoute,
   ProductsIndexRoute: ProductsIndexRoute,

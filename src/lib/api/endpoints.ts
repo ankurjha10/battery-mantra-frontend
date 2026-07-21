@@ -3,6 +3,10 @@
  * Do not invent paths. Every path here is a real backend route.
  */
 export const endpoints = {
+  cms: {
+    public: "/api/cms/pages",
+    admin: "/api/admin/cms/pages",
+  },
   auth: {
     login: "/api/auth/login",
     register: "/api/auth/register",
