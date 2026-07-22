@@ -9,8 +9,9 @@ import { Spinner } from "@/components/feedback/Spinner";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Copy, MapPin, Phone, Mail, Calendar, Package2, User } from "lucide-react";
+import { Copy, MapPin, Phone, Mail, Calendar, Package2, User, Package, Clock, CheckCircle2, TrendingUp } from "lucide-react";
 import type { OrderStatus, OrderResponse } from "@/types/dto";
+import { Card, CardContent } from "@/components/ui/card";
 
 export const Route = createFileRoute("/partner/")({
   component: PartnerDashboard,
@@ -61,6 +62,17 @@ function PartnerDashboard() {
     }
   };
 
+  const totalOrdersCount = orders.length;
+  const pendingOrdersCount = orders.filter(
+    (o) => o.orderStatus === "PENDING" || o.orderStatus === "PROCESSING"
+  ).length;
+  const completedOrdersCount = orders.filter(
+    (o) => o.orderStatus === "DELIVERED"
+  ).length;
+  const totalRevenue = orders
+    .filter((o) => o.orderStatus !== "CANCELLED" && o.orderStatus !== "RETURNED")
+    .reduce((sum, o) => sum + (o.totalAmount || 0), 0);
+
   if (isLoading) {
     return (
       <div className="flex h-[50vh] items-center justify-center">
@@ -73,9 +85,64 @@ function PartnerDashboard() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Assigned Orders</h1>
-          <p className="text-muted-foreground">Manage and process orders assigned to your branch.</p>
+          <h1 className="text-2xl font-bold tracking-tight">Partner Dashboard</h1>
+          <p className="text-muted-foreground">Overview of your branch orders, performance metrics, and pending actions.</p>
         </div>
+      </div>
+
+      {/* Top Summary Cards */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Card className="shadow-sm border-l-4 border-l-blue-500">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div className="space-y-1">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Assigned</p>
+              <p className="text-2xl font-bold">{totalOrdersCount}</p>
+              <p className="text-xs text-muted-foreground">All time assigned orders</p>
+            </div>
+            <div className="rounded-full bg-blue-500/10 p-3 text-blue-600">
+              <Package className="h-5 w-5" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm border-l-4 border-l-amber-500">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div className="space-y-1">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Action Needed</p>
+              <p className="text-2xl font-bold text-amber-600">{pendingOrdersCount}</p>
+              <p className="text-xs text-muted-foreground">Pending / Processing</p>
+            </div>
+            <div className="rounded-full bg-amber-500/10 p-3 text-amber-600">
+              <Clock className="h-5 w-5" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm border-l-4 border-l-emerald-500">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div className="space-y-1">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Completed</p>
+              <p className="text-2xl font-bold text-emerald-600">{completedOrdersCount}</p>
+              <p className="text-xs text-muted-foreground">Delivered & Installed</p>
+            </div>
+            <div className="rounded-full bg-emerald-500/10 p-3 text-emerald-600">
+              <CheckCircle2 className="h-5 w-5" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm border-l-4 border-l-purple-500">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div className="space-y-1">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Business Volume</p>
+              <p className="text-2xl font-bold text-purple-600">₹{totalRevenue.toLocaleString()}</p>
+              <p className="text-xs text-muted-foreground">Active orders value</p>
+            </div>
+            <div className="rounded-full bg-purple-500/10 p-3 text-purple-600">
+              <TrendingUp className="h-5 w-5" />
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="rounded-xl border bg-card shadow-sm">
