@@ -26,6 +26,7 @@ export interface CreateEngineerRequest {
   address?: string;
   city?: string;
   password?: string;
+  isActive?: boolean;
   partnerId?: string;
 }
 

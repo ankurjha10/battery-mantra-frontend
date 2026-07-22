@@ -31,6 +31,7 @@ export interface CreatePartnerRequest {
   alternatePhone?: string;
   address?: string;
   password?: string;
+  isActive?: boolean;
   operatingCityIds: string[];
 }
 

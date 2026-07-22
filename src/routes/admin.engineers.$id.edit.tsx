@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { ChevronLeft } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Spinner } from "@/components/feedback/Spinner";
+import { Switch } from "@/components/ui/switch";
 import { useEffect } from "react";
 
 export const Route = createFileRoute("/admin/engineers/$id/edit")({
@@ -25,6 +26,7 @@ const schema = z.object({
   alternatePhone: z.string().optional(),
   address: z.string().optional(),
   password: z.string().optional(), // Optional for edit
+  isActive: z.boolean().optional(),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -48,6 +50,7 @@ function EditEngineerPage() {
       alternatePhone: "",
       address: "",
       password: "",
+      isActive: true,
     },
   });
 
@@ -61,6 +64,7 @@ function EditEngineerPage() {
         alternatePhone: engineer.alternatePhone || "",
         address: engineer.address || "",
         password: "",
+        isActive: engineer.isActive,
       });
     }
   }, [engineer, form]);
@@ -138,6 +142,24 @@ function EditEngineerPage() {
             <FormField label="New Password (Optional)" error={form.formState.errors.password?.message}>
               <PasswordInput {...form.register("password")} placeholder="Leave blank to keep current password" />
             </FormField>
+          </div>
+          
+          <div className="sm:col-span-2 flex items-center justify-between rounded-lg border p-4 bg-muted/20">
+            <div className="space-y-0.5">
+              <h3 className="text-base font-medium">Account Status</h3>
+              <p className="text-sm text-muted-foreground">
+                Active accounts can log in and receive orders. Suspended accounts cannot.
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className={`text-sm font-medium ${form.watch("isActive") ? "text-green-600" : "text-muted-foreground"}`}>
+                {form.watch("isActive") ? "Active" : "Suspended"}
+              </span>
+              <Switch
+                checked={form.watch("isActive")}
+                onCheckedChange={(checked) => form.setValue("isActive", checked, { shouldDirty: true })}
+              />
+            </div>
           </div>
         </div>
 

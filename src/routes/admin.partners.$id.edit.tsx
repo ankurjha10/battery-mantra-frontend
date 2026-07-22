@@ -12,6 +12,7 @@ import { ChevronLeft } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { locationService } from "@/services/location.service";
 import { Spinner } from "@/components/feedback/Spinner";
+import { Switch } from "@/components/ui/switch";
 import { useEffect } from "react";
 
 export const Route = createFileRoute("/admin/partners/$id/edit")({
@@ -26,6 +27,7 @@ const schema = z.object({
   alternatePhone: z.string().optional(),
   address: z.string().optional(),
   password: z.string().optional(), // Optional for edit
+  isActive: z.boolean().optional(),
   operatingCityIds: z.array(z.string()).min(1, "Select at least one city"),
 });
 
@@ -55,6 +57,7 @@ function EditPartnerPage() {
       alternatePhone: "",
       address: "",
       password: "",
+      isActive: true,
       operatingCityIds: [],
     },
   });
@@ -69,6 +72,7 @@ function EditPartnerPage() {
         alternatePhone: partner.alternatePhone || "",
         address: partner.address || "",
         password: "",
+        isActive: partner.isActive,
         operatingCityIds: partner.operatingCities?.map(c => c.cityId) || [],
       });
     }
@@ -157,6 +161,24 @@ function EditPartnerPage() {
             <FormField label="Business Address (Optional)" error={form.formState.errors.address?.message}>
               <Input {...form.register("address")} placeholder="Full address" />
             </FormField>
+          </div>
+          
+          <div className="sm:col-span-2 flex items-center justify-between rounded-lg border p-4 bg-muted/20">
+            <div className="space-y-0.5">
+              <h3 className="text-base font-medium">Account Status</h3>
+              <p className="text-sm text-muted-foreground">
+                Active accounts can log in and receive orders. Suspended accounts cannot.
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className={`text-sm font-medium ${form.watch("isActive") ? "text-green-600" : "text-muted-foreground"}`}>
+                {form.watch("isActive") ? "Active" : "Suspended"}
+              </span>
+              <Switch
+                checked={form.watch("isActive")}
+                onCheckedChange={(checked) => form.setValue("isActive", checked, { shouldDirty: true })}
+              />
+            </div>
           </div>
         </div>
 
