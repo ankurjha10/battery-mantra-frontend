@@ -52,26 +52,17 @@ function LoginPage() {
     try {
       const res = await authService.login(values);
 
-      // Since the backend doesn't return the role in the JWT or login response,
-      // we probe an admin endpoint to check if the user is an ADMIN.
-      let role = "CUSTOMER";
-      try {
-        const baseUrl = env.API_BASE_URL.replace(/\/$/, "");
-        const probeRes = await fetch(`${baseUrl}/api/admin/users`, {
-          method: "GET",
-          headers: { Authorization: `Bearer ${res.token}` },
-        });
-        if (probeRes.ok) {
-          role = "ADMIN";
-        }
-      } catch (e) {
-        // ignore
+      let role = res.role || "CUSTOMER";
+
+      if (role === "ENGINEER") {
+        setServerError("Please use the Engineer Mobile App to login.");
+        return;
       }
 
       setSession(res.token, res.refreshToken, {
         id: res.id,
         username: values.username,
-        roles: [role as "ADMIN" | "CUSTOMER"],
+        roles: [role as any],
       });
       toast.success("Welcome back");
 
@@ -85,6 +76,8 @@ function LoginPage() {
         }
       } else if (role === "ADMIN") {
         router.navigate({ to: "/admin" as any });
+      } else if (role === "PARTNER") {
+        router.navigate({ to: "/partner" as any });
       } else {
         router.navigate({ to: "/" as any });
       }

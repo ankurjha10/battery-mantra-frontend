@@ -77,6 +77,7 @@ export const endpoints = {
     orders: "/api/admin/orders",
     upload: "/api/admin/upload",
     updateOrderStatus: (orderId: string) => `/api/admin/orders/${encodeURIComponent(orderId)}/status`,
+    assignPartner: (orderId: string, partnerId: string) => `/api/admin/orders/${encodeURIComponent(orderId)}/assign-partner?partnerId=${encodeURIComponent(partnerId)}`,
     products: {
       create: "/api/admin/products",
       update: (id: string) => `/api/admin/products/id/${encodeURIComponent(id)}`,

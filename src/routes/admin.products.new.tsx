@@ -41,6 +41,7 @@ const formSchema = z.object({
       value: z.string().min(1, "Value is required")
     })).default([])
   })).default([]),
+  isAutoAssignToPartner: z.boolean().default(true),
   seo: z.object({
     slug: z.string().optional(),
     metaTitle: z.string().optional(),
@@ -90,6 +91,7 @@ function AddProductPage() {
       capacity: "",
       specs: [],
       cityPrices: [],
+      isAutoAssignToPartner: true,
       seo: {
         slug: "",
         metaTitle: "",
@@ -180,6 +182,7 @@ function AddProductPage() {
       brandId: data.brandId,
       capacity: data.capacity || undefined,
       specs: Object.keys(specsRecord).length > 0 ? specsRecord : undefined,
+      isAutoAssignToPartner: data.isAutoAssignToPartner,
       seo: data.seo
     };
 
@@ -437,6 +440,25 @@ function AddProductPage() {
                   </SelectContent>
                 </Select>
                 {form.formState.errors.brandId && <p className="text-xs text-red-500">{form.formState.errors.brandId.message}</p>}
+              </div>
+
+              <div className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                <Controller
+                  control={form.control}
+                  name="isAutoAssignToPartner"
+                  render={({ field }) => (
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  )}
+                />
+                <div className="space-y-1 leading-none">
+                  <Label>Auto-Assign Order to Partner</Label>
+                  <p className="text-[12px] text-muted-foreground">
+                    When checked, orders for this product will be automatically forwarded to the local partner based on the customer's city. If unchecked, the admin must manually transfer it.
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>

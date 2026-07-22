@@ -35,6 +35,8 @@ const navigation = [
   { name: "Pricing %", href: "/admin/bulk-pricing", icon: Percent },
   { name: "CMS Pages", href: "/admin/pages", icon: FileText },
   { name: "Users", href: "/admin/users", icon: Users },
+  { name: "Engineers", href: "/admin/engineers", icon: Users },
+  { name: "Partners", href: "/admin/partners", icon: Users },
   { name: "Banners", href: "/admin/banners", icon: Image },
   { name: "Callbacks", href: "/admin/callbacks", icon: PhoneCall },
 ];

@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Copy, Truck, Wrench, Search, MapPin, Calendar, User, Phone, Mail, Eye } from "lucide-react";
+import { partnerService } from "@/services/partner.service";
 import type { OrderStatus, OrderResponse } from "@/types/dto";
 
 export const Route = createFileRoute("/admin/orders/")({
@@ -51,6 +52,21 @@ function AdminOrders() {
       toast.success("Order status updated");
     },
     onError: () => toast.error("Failed to update order status"),
+  });
+
+  const { data: partners = [] } = useQuery({
+    queryKey: ["admin", "partners"],
+    queryFn: partnerService.getAll,
+  });
+
+  const assignPartnerMutation = useMutation({
+    mutationFn: ({ orderId, partnerId }: { orderId: string; partnerId: string }) =>
+      adminService.assignPartner(orderId, partnerId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "orders"] });
+      toast.success("Partner assigned successfully");
+    },
+    onError: () => toast.error("Failed to assign partner"),
   });
 
   const filteredOrders = orders.filter((o) =>
@@ -477,6 +493,35 @@ function AdminOrders() {
                       <span className="leading-relaxed">{selectedOrder.shippingAddress || "No Address Provided"}</span>
                     </div>
                   </div>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wider">Partner Assignment</h3>
+                <div className="rounded-xl border bg-card p-4 flex items-center gap-4">
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">Assign to Partner</p>
+                    <p className="text-xs text-muted-foreground">Select a partner to manage fulfillment for this order.</p>
+                  </div>
+                  <Select
+                    defaultValue={selectedOrder.assignedPartner?.id || ""}
+                    onValueChange={(val) => {
+                      assignPartnerMutation.mutate({ orderId: selectedOrder.orderId, partnerId: val });
+                      // Optimistically update local selected order
+                      const p = partners.find(p => p.id === val);
+                      if (p) setSelectedOrder({ ...selectedOrder, assignedPartner: p as any });
+                    }}
+                    disabled={assignPartnerMutation.isPending}
+                  >
+                    <SelectTrigger className="w-[200px]">
+                      <SelectValue placeholder="Select Partner" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {partners.map(p => (
+                        <SelectItem key={p.id} value={p.id}>{p.businessName} - {p.operatingCities.map(c => c.cityName).join(", ")}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
