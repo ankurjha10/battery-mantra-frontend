@@ -36,6 +36,9 @@ export const Route = createFileRoute("/_auth/login")({
   component: LoginPage,
 });
 
+import { decodeJwt } from "@/lib/auth/jwt";
+import { ROLES, type Role } from "@/constants/roles";
+
 function LoginPage() {
   const router = useRouter();
   const { setSession } = useAuth();
@@ -53,6 +56,16 @@ function LoginPage() {
       const res = await authService.login(values);
 
       let role = res.role || "CUSTOMER";
+      try {
+        const p = decodeJwt(res.token);
+        const rawRoles = (p.roles as string[] | undefined) ?? (p.authorities as string[] | undefined) ?? (typeof p.role === "string" ? [p.role as string] : []);
+        const parsedRoles = rawRoles.map((r) => r.replace(/^ROLE_/, "").toUpperCase()).filter((r): r is Role => (Object.values(ROLES) as string[]).includes(r));
+        if (parsedRoles.length > 0) {
+          role = parsedRoles[0];
+        }
+      } catch (e) {
+        console.error("Failed to parse JWT for role in login", e);
+      }
 
       if (role === "ENGINEER") {
         setServerError("Please use the Engineer Mobile App to login.");
