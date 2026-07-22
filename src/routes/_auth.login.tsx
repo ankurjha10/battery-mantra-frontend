@@ -66,7 +66,11 @@ function LoginPage() {
       });
       toast.success("Welcome back");
 
-      if (redirect) {
+      if (role === "ADMIN") {
+        router.navigate({ to: "/admin" as any });
+      } else if (role === "PARTNER") {
+        router.navigate({ to: "/partner" as any });
+      } else if (redirect) {
         const [path, query] = redirect.split("?");
         if (query) {
           const params = Object.fromEntries(new URLSearchParams(query));
@@ -74,10 +78,6 @@ function LoginPage() {
         } else {
           router.navigate({ to: path as any });
         }
-      } else if (role === "ADMIN") {
-        router.navigate({ to: "/admin" as any });
-      } else if (role === "PARTNER") {
-        router.navigate({ to: "/partner" as any });
       } else {
         router.navigate({ to: "/" as any });
       }
