@@ -37,9 +37,9 @@ const FOOTER_GROUPS: FooterGroup[] = [
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { pathname } = useLocation();
-  const isAdminPage = pathname.startsWith("/admin");
+  const isDashboardPage = pathname.startsWith("/admin") || pathname.startsWith("/partner");
 
-  if (isAdminPage) {
+  if (isDashboardPage) {
     return (
       <div className="flex min-h-screen flex-col bg-background">
         <main id="main" className="flex-1 flex flex-col">
