@@ -22,23 +22,23 @@ export function DynamicFaq({ pageType, context, hideHeading = false }: DynamicFa
   };
 
   if (isLoading) {
-    return <div className="py-8 flex justify-center"><Spinner /></div>;
+    return <div className="min-h-[400px] flex items-center justify-center"><Spinner /></div>;
   }
 
   if (!faqs.length) return null;
 
   return (
-    <div className="w-full max-w-4xl mx-auto py-8">
+    <div className="w-full">
       {!hideHeading && (
         <h2 className="text-3xl font-display font-bold text-center mb-8">Frequently Asked Questions</h2>
       )}
-      <Accordion type="single" collapsible className="w-full space-y-4">
+      <Accordion type="single" collapsible className="w-full">
         {faqs.map((faq) => (
-          <AccordionItem key={faq.faqId} value={faq.faqId} className="border rounded-lg bg-card px-4 shadow-sm">
-            <AccordionTrigger className="text-left font-semibold text-lg hover:no-underline hover:text-primary">
+          <AccordionItem key={faq.faqId} value={faq.faqId} className="border-b border-border/50">
+            <AccordionTrigger className="text-left font-medium text-base hover:no-underline hover:text-primary py-4">
               {replacePlaceholders(faq.title)}
             </AccordionTrigger>
-            <AccordionContent className="text-muted-foreground leading-relaxed pt-2 pb-4">
+            <AccordionContent className="text-muted-foreground leading-relaxed pb-4">
               <div 
                 className="prose prose-sm max-w-none dark:prose-invert"
                 dangerouslySetInnerHTML={{ __html: replacePlaceholders(faq.description) }} 

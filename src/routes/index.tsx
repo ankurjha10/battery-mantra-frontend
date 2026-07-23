@@ -156,9 +156,9 @@ function HomePage() {
         </section>
 
         <section aria-labelledby="faq" className="w-full">
-          <div className="grid lg:grid-cols-2 gap-10 xl:gap-16 items-center">
+          <div className="grid lg:grid-cols-2 gap-10 xl:gap-16 items-start">
             {/* FAQ Accordion side */}
-            <div className="space-y-6 order-2">
+            <div className="space-y-6 order-2 lg:pt-8">
               <SectionHeading
                 eyebrow="FAQ"
                 title={<span id="faq">Questions, answered</span>}
