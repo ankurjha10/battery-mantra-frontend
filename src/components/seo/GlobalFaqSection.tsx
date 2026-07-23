@@ -20,7 +20,7 @@ export function GlobalFaqSection() {
           {/* Image side */}
           <div className="hidden lg:flex justify-center order-1">
             <img
-              src="/images/FAQ%20Side%20Image.jpeg"
+              src="/images/FAQ Side Image.png"
               alt="FAQ"
               className="w-48 sm:w-64 lg:w-full max-w-md xl:max-w-lg h-auto object-contain drop-shadow-2xl lg:scale-105"
             />
