@@ -67,7 +67,7 @@ function PartnerOverviewDashboard() {
       </div>
 
       {/* Top KPI Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-3">
         <Card className="shadow-sm border-l-4 border-l-blue-500">
           <CardContent className="p-4 flex items-center justify-between">
             <div className="space-y-1">
@@ -106,23 +106,26 @@ function PartnerOverviewDashboard() {
             </div>
           </CardContent>
         </Card>
-
-        <Card className="shadow-sm border-l-4 border-l-purple-500">
-          <CardContent className="p-4 flex items-center justify-between">
-            <div className="space-y-1">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Business Volume</p>
-              <p className="text-2xl font-bold text-purple-600">₹{totalRevenue.toLocaleString()}</p>
-              <p className="text-xs text-muted-foreground">Active orders value</p>
-            </div>
-            <div className="rounded-full bg-purple-500/10 p-3 text-purple-600">
-              <TrendingUp className="h-5 w-5" />
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Quick Navigation Cards */}
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Card className="hover:border-primary/50 transition-colors shadow-sm">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Package className="h-4 w-4 text-primary" /> Assigned Orders
+            </CardTitle>
+            <CardDescription className="text-xs">
+              View and manage orders assigned to your branch.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button asChild variant="outline" size="sm" className="w-full text-xs">
+              <Link to="/partner/orders">Manage Orders</Link>
+            </Button>
+          </CardContent>
+        </Card>
+
         <Card className="hover:border-primary/50 transition-colors shadow-sm">
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
@@ -135,38 +138,6 @@ function PartnerOverviewDashboard() {
           <CardContent>
             <Button asChild variant="outline" size="sm" className="w-full text-xs">
               <Link to="/partner/engineers">Manage Engineers</Link>
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="hover:border-primary/50 transition-colors shadow-sm">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Package className="h-4 w-4 text-primary" /> Store Inventory
-            </CardTitle>
-            <CardDescription className="text-xs">
-              Track battery stock levels in your local warehouse.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button asChild variant="outline" size="sm" className="w-full text-xs">
-              <Link to="/partner/inventory">View Stock</Link>
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="hover:border-primary/50 transition-colors shadow-sm">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Wallet className="h-4 w-4 text-primary" /> Earnings & Payouts
-            </CardTitle>
-            <CardDescription className="text-xs">
-              View installation commission reports and settlements.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button asChild variant="outline" size="sm" className="w-full text-xs">
-              <Link to="/partner/earnings">View Financials</Link>
             </Button>
           </CardContent>
         </Card>
