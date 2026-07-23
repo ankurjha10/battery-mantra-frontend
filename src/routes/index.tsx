@@ -117,66 +117,66 @@ function HomePage() {
 
       <div className="order-4 w-full">
         <Container size="xl" className="space-y-16 py-12 sm:py-16">
-        <section aria-labelledby="brands">
-          <SectionHeading
-            eyebrow="Trusted brands"
-            title={<span id="brands">Top battery brands</span>}
-          />
-          <div className="mt-6">
-            <BrandStrip />
-          </div>
-        </section>
-
-        <section aria-labelledby="featured">
-          <SectionHeading
-            eyebrow="Best of"
-            title={<span id="featured">Featured batteries</span>}
-            action={
-              <Button asChild variant="ghost-brand">
-                <Link to="/products">
-                  View all <ArrowRight className="h-4 w-4" />
-                </Link>
-              </Button>
-            }
-          />
-          <div className="mt-6">
-            <FeaturedProducts limit={8} />
-          </div>
-        </section>
-
-        <section aria-labelledby="why">
-          <SectionHeading
-            eyebrow="Why BatteryMantra"
-            title={<span id="why">Built for confidence</span>}
-            align="center"
-          />
-          <div className="mt-8">
-            <WhyChooseUs />
-          </div>
-        </section>
-
-        <section aria-labelledby="faq" className="w-full">
-          <div className="grid lg:grid-cols-2 gap-10 xl:gap-16 items-start">
-            {/* FAQ Accordion side */}
-            <div className="space-y-6 order-2 lg:pt-8">
-              <SectionHeading
-                eyebrow="FAQ"
-                title={<span id="faq">Questions, answered</span>}
-                align="left"
-              />
-              <DynamicFaq pageType="UNIVERSAL" context={{}} hideHeading />
+          <section aria-labelledby="brands">
+            <SectionHeading
+              eyebrow="Trusted brands"
+              title={<span id="brands">Top battery brands</span>}
+            />
+            <div className="mt-6">
+              <BrandStrip />
             </div>
+          </section>
 
-            {/* Image side */}
-            <div className="hidden lg:flex justify-center order-1">
-              <img 
-                src="/images/FAQ%20Side%20Image.jpeg" 
-                alt="FAQ" 
-                className="w-48 sm:w-64 lg:w-full max-w-md xl:max-w-lg h-auto object-contain drop-shadow-2xl lg:scale-105" 
-              />
+          <section aria-labelledby="featured">
+            <SectionHeading
+              eyebrow="Best of"
+              title={<span id="featured">Featured batteries</span>}
+              action={
+                <Button asChild variant="ghost-brand">
+                  <Link to="/products">
+                    View all <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+              }
+            />
+            <div className="mt-6">
+              <FeaturedProducts limit={8} />
             </div>
-          </div>
-        </section>
+          </section>
+
+          <section aria-labelledby="why">
+            <SectionHeading
+              eyebrow="Why BatteryMantra"
+              title={<span id="why">Built for confidence</span>}
+              align="center"
+            />
+            <div className="mt-8">
+              <WhyChooseUs />
+            </div>
+          </section>
+
+          <section aria-labelledby="faq" className="w-full">
+            <div className="grid lg:grid-cols-2 gap-10 xl:gap-16 items-start">
+              {/* FAQ Accordion side */}
+              <div className="space-y-6 order-2 lg:pt-8">
+                <SectionHeading
+                  eyebrow="FAQ"
+                  title={<span id="faq">Questions, answered</span>}
+                  align="left"
+                />
+                <DynamicFaq pageType="UNIVERSAL" context={{}} hideHeading />
+              </div>
+
+              {/* Image side */}
+              <div className="hidden lg:flex justify-center order-1">
+                <img
+                  src="/images/FAQ%20Side%20Image.png"
+                  alt="FAQ"
+                  className="w-48 sm:w-64 lg:w-full max-w-md xl:max-w-lg h-auto object-contain drop-shadow-2xl lg:scale-105"
+                />
+              </div>
+            </div>
+          </section>
         </Container>
       </div>
 
