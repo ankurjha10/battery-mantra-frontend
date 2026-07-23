@@ -8,8 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { ArrowLeft } from "lucide-react";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 
 export const Route = createFileRoute("/admin/faqs/new")({
   component: NewFaq,
@@ -99,12 +98,11 @@ function NewFaq() {
 
         <div className="space-y-2">
           <Label>Description (Answer) <span className="text-destructive">*</span></Label>
-          <div className="bg-white rounded-md border">
-            <ReactQuill 
-              theme="snow" 
+          <div className="bg-white rounded-md border min-h-[200px]">
+            <RichTextEditor 
               value={description} 
               onChange={setDescription} 
-              className="h-[200px] mb-12"
+              className="min-h-[200px]"
             />
           </div>
         </div>
