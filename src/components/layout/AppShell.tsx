@@ -2,7 +2,6 @@ import { useLocation } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { Navbar } from "./Navbar";
 import { Footer, type FooterGroup } from "./Footer";
-import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
 
 const FOOTER_GROUPS: FooterGroup[] = [
   {
@@ -62,7 +61,6 @@ export function AppShell({ children }: { children: ReactNode }) {
       <main id="main" className="flex-1 flex flex-col">
         {children}
       </main>
-      <GlobalFaqSection />
       <Footer groups={FOOTER_GROUPS} />
     </div>
   );

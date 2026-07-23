@@ -1,8 +1,12 @@
 import { DynamicFaq } from "@/components/seo/DynamicFaq";
 import { SectionHeading } from "@/components/layout/SectionHeading";
 import { Container } from "@/components/layout/Container";
+interface GlobalFaqSectionProps {
+  pageType?: "UNIVERSAL" | "CATEGORY" | "MANUFACTURER" | "BRAND" | "BRAND_MODEL" | "PRODUCT";
+  context?: Record<string, string>;
+}
 
-export function GlobalFaqSection() {
+export function GlobalFaqSection({ pageType = "UNIVERSAL", context = {} }: GlobalFaqSectionProps) {
   return (
     <Container size="xl" className="py-12 sm:py-16">
       <section aria-labelledby="faq" className="w-full">
@@ -14,7 +18,7 @@ export function GlobalFaqSection() {
               title={<span id="faq">Questions, answered</span>}
               align="left"
             />
-            <DynamicFaq pageType="UNIVERSAL" context={{}} hideHeading />
+            <DynamicFaq pageType={pageType} context={context} hideHeading />
           </div>
 
           {/* Image side */}

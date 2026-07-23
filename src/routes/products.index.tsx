@@ -21,9 +21,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { productFilterQuery } from "@/queries";
+import { productFilterQuery, brandsQuery, categoriesQuery, vehiclesListQuery } from "@/queries";
 import type { ProductFilterParams } from "@/types/dto";
 import { DynamicSearchBanner } from "@/components/products/DynamicSearchBanner";
+import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
 
 const searchSchema = z.object({
   q: z.string().optional(),
@@ -81,6 +82,28 @@ function ProductsPage() {
   };
 
   const { data, isLoading, isError, refetch, isFetching } = useQuery(productFilterQuery(params));
+
+  const { data: brands } = useQuery(brandsQuery());
+  const { data: categories } = useQuery(categoriesQuery());
+  const { data: vehicles } = useQuery(vehiclesListQuery());
+  
+  const brand = search.brandId ? brands?.find((b: any) => b.brandId === search.brandId) : null;
+  const category = search.categoryId ? categories?.find((c: any) => c.categoryId === search.categoryId) : null;
+  const vehicle = search.vehicleId ? vehicles?.find((v: any) => v.vehicleId === search.vehicleId) : null;
+
+  let pageType: "UNIVERSAL" | "CATEGORY" | "BRAND" | "BRAND_MODEL" = "UNIVERSAL";
+  let context: Record<string, string> = {};
+
+  if (vehicle) {
+    pageType = "BRAND_MODEL";
+    context = { model_name: vehicle.model, brand_name: vehicle.make, category_name: category?.categoryName || "Battery" };
+  } else if (brand) {
+    pageType = "BRAND";
+    context = { brand_name: brand.brandName, category_name: category?.categoryName || "Battery" };
+  } else if (category) {
+    pageType = "CATEGORY";
+    context = { category_name: category.categoryName };
+  }
 
   type SearchState = typeof search;
   const setFilters = (next: ProductFilterState) => {
@@ -193,6 +216,8 @@ function ProductsPage() {
           )}
         </div>
       </Container>
+      
+      <GlobalFaqSection pageType={pageType} context={context} />
     </div>
   );
 }

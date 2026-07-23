@@ -11,6 +11,7 @@ import { ManufacturerGrid } from "@/components/home/ManufacturerGrid";
 import { BrandStrip } from "@/components/home/BrandStrip";
 import { FeaturedProducts } from "@/components/home/FeaturedProducts";
 import { WhyChooseUs } from "@/components/home/WhyChooseUs";
+import { GlobalFaqSection } from "@/components/seo/GlobalFaqSection";
 
 import { CallbackBanner } from "@/components/home/CallbackBanner";
 import {
@@ -154,10 +155,10 @@ function HomePage() {
               <WhyChooseUs />
             </div>
           </section>
-
-
         </Container>
       </div>
+
+      <GlobalFaqSection />
 
       <div className="order-5 w-full">
         <CallbackBanner />
