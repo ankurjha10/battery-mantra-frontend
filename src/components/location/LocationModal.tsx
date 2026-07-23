@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { MapPin, Navigation, MapPinOff, Loader2 } from "lucide-react";
+import { MapPin, Navigation, MapPinOff, Loader2, Search } from "lucide-react";
 import { useLocationStore } from "@/store/useLocationStore";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -16,17 +16,22 @@ interface LocationModalProps {
 
 export const LocationModal = ({ isOpen, onClose }: LocationModalProps) => {
   const [pincodeInput, setPincodeInput] = useState("");
+  const [citySearch, setCitySearch] = useState("");
   const [isChecking, setIsChecking] = useState(false);
   const { detectLocation, isLocating } = useGeolocation();
   const { setLocation, pincode: currentPincode, isServiceable } = useLocationStore();
 
   const qc = useQueryClient();
 
-  const { data: popularCities, isLoading: isLoadingCities } = useQuery({
+  const { data: allCities = [], isLoading: isLoadingCities } = useQuery({
     queryKey: ["locations", "public-cities"],
     queryFn: () => locationService.getPublicCities(),
-    select: (cities) => cities.filter(c => c.isPopular),
   });
+
+  const popularCities = allCities.filter((c: any) => c.isPopular);
+  const filteredCities = citySearch.trim() 
+    ? allCities.filter((c: any) => c.cityName.toLowerCase().includes(citySearch.toLowerCase()))
+    : popularCities;
 
   const handlePincodeCheck = async (code: string) => {
     if (!code || code.length !== 6) {
@@ -64,20 +69,20 @@ export const LocationModal = ({ isOpen, onClose }: LocationModalProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md bg-white border border-gray-100 shadow-2xl rounded-2xl overflow-hidden p-0">
-        <div className="p-6 bg-gradient-to-b from-primary/5 to-transparent border-b border-gray-50">
+      <DialogContent className="sm:max-w-sm bg-white border border-gray-100 shadow-2xl rounded-2xl overflow-hidden p-0">
+        <div className="p-4 bg-gradient-to-b from-primary/5 to-transparent border-b border-gray-50">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold flex items-center gap-2 text-gray-900">
-              <MapPin className="text-primary h-6 w-6" />
+            <DialogTitle className="text-xl font-bold flex items-center gap-2 text-gray-900">
+              <MapPin className="text-primary h-5 w-5" />
               Select Your Location
             </DialogTitle>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-xs text-gray-500 mt-1">
               To see accurate pricing and delivery options, please set your location.
             </p>
           </DialogHeader>
         </div>
 
-        <div className="space-y-6 px-6 pb-6 pt-4">
+        <div className="space-y-4 px-4 pb-4 pt-3">
           {/* Detect Location Button */}
           <Button 
             variant="default" 
@@ -141,30 +146,43 @@ export const LocationModal = ({ isOpen, onClose }: LocationModalProps) => {
             </div>
           )}
 
-          {/* Popular Cities */}
-          {popularCities && popularCities.length > 0 && (
-            <div className="pt-2">
-              <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Popular Cities</h4>
-              <div className="grid grid-cols-3 gap-2">
-                {popularCities.map((city) => (
-                  <button
-                    key={city.cityId}
-                    onClick={() => handleCitySelect(city)}
-                    className="flex flex-col items-center p-2 rounded-lg border border-gray-100 hover:border-primary/30 hover:bg-primary/5 transition-all"
-                  >
-                    {city.cityImage ? (
-                      <img src={city.cityImage} alt={city.cityName} className="w-10 h-10 object-cover rounded-full mb-2 border border-gray-200" />
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mb-2">
-                        <MapPin className="h-5 w-5 text-gray-400" />
-                      </div>
-                    )}
-                    <span className="text-xs font-medium text-gray-700">{city.cityName}</span>
-                  </button>
-                ))}
-              </div>
+          {/* City Search */}
+          <div>
+            <div className="relative mb-3">
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Search your city..."
+                value={citySearch}
+                onChange={(e) => setCitySearch(e.target.value)}
+                className="pl-9 h-10 bg-gray-50 border-gray-200 focus-visible:ring-primary/50"
+              />
             </div>
-          )}
+            
+            <div className="max-h-[160px] overflow-y-auto pr-1 no-scrollbar">
+              {filteredCities.length > 0 ? (
+                <div className="grid grid-cols-3 gap-2">
+                  {filteredCities.map((city: any) => (
+                    <button
+                      key={city.cityId}
+                      onClick={() => handleCitySelect(city)}
+                      className="flex flex-col items-center p-2 rounded-lg border border-gray-100 hover:border-primary/30 hover:bg-primary/5 transition-all"
+                    >
+                      {city.cityImage ? (
+                        <img src={city.cityImage} alt={city.cityName} className="w-8 h-8 object-cover rounded-full mb-1 border border-gray-200" />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mb-1">
+                          <MapPin className="h-4 w-4 text-gray-400" />
+                        </div>
+                      )}
+                      <span className="text-[10px] font-medium text-gray-700 text-center leading-tight line-clamp-1">{city.cityName}</span>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center text-xs text-gray-500 py-4">No cities found</div>
+              )}
+            </div>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
