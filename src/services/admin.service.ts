@@ -110,6 +110,10 @@ export const adminService = {
     apiFetch<ProductDetailResponse>(endpoints.admin.products.update(id), { method: "PATCH", body }),
   deleteProduct: (id: UUID) => 
     apiFetch<void>(endpoints.admin.products.delete(id), { method: "DELETE" }),
+  getPendingProducts: () =>
+    apiFetch<ProductListResponse[]>("/api/admin/products/pending-approvals", { method: "GET" }),
+  approveProduct: (id: UUID) =>
+    apiFetch<ProductDetailResponse>(`/api/admin/products/${id}/approve`, { method: "PATCH" }),
 
   // Categories
   createCategory: (body: CreateCategoryRequest) => 

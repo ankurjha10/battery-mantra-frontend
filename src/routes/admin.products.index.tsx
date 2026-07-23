@@ -6,7 +6,7 @@ import { adminService } from "@/services/admin.service";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/feedback/Spinner";
-import { Trash2, Plus, Edit } from "lucide-react";
+import { Trash2, Plus, Edit, CheckCircle, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -57,10 +57,19 @@ function AdminProducts() {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => adminService.deleteProduct(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["products", "list"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
       toast.success("Product deleted successfully");
     },
     onError: () => toast.error("Failed to delete product"),
+  });
+
+  const approveMutation = useMutation({
+    mutationFn: (id: string) => adminService.approveProduct(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      toast.success("Product approved and activated!");
+    },
+    onError: () => toast.error("Failed to approve product"),
   });
 
   return (
@@ -151,7 +160,16 @@ function AdminProducts() {
                       <div className="h-10 w-10 rounded-md bg-muted flex items-center justify-center text-xs text-muted-foreground">N/A</div>
                     )}
                   </TableCell>
-                  <TableCell className="font-medium">{product.productName}</TableCell>
+                  <TableCell className="font-medium">
+                    <div>
+                      <p>{product.productName}</p>
+                      {product.isApproved === false && (
+                        <span className="mt-1 inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-500/15 border border-amber-500/30 rounded-full px-2 py-0.5">
+                          <Clock className="h-3 w-3" /> Pending Partner Request {product.partnerBusinessName ? `(${product.partnerBusinessName})` : ""}
+                        </span>
+                      )}
+                    </div>
+                  </TableCell>
                   <TableCell>{product.productCategory || "N/A"}</TableCell>
                   <TableCell>{product.brandName || "N/A"}</TableCell>
                   <TableCell>
@@ -165,6 +183,17 @@ function AdminProducts() {
                   </TableCell>
                   <TableCell>₹{product.productPrice.toLocaleString()}</TableCell>
                   <TableCell className="text-right">
+                    {product.isApproved === false && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => approveMutation.mutate(product.productId)}
+                        disabled={approveMutation.isPending}
+                        className="mr-2 text-xs text-emerald-600 border-emerald-500/40 hover:bg-emerald-500/10 gap-1 font-semibold"
+                      >
+                        <CheckCircle className="h-3.5 w-3.5 text-emerald-600" /> Approve
+                      </Button>
+                    )}
                     <Button asChild variant="ghost" size="icon">
                       <Link to={`/admin/products/${product.productId}/edit`}>
                         <Edit className="h-4 w-4" />

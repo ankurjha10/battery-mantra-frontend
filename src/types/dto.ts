@@ -160,6 +160,9 @@ export type ProductListResponse = {
   productImage?: string;
   productCategory?: string;
   capacity?: string;
+  isApproved?: boolean;
+  createdByPartnerId?: UUID;
+  partnerBusinessName?: string;
 };
 
 export type ProductDetailResponse = {
@@ -176,6 +179,9 @@ export type ProductDetailResponse = {
   productImage?: string;
   specs?: Record<string, unknown>;
   compatibleVehicles?: VehicleResponse[];
+  isApproved?: boolean;
+  createdByPartnerId?: UUID;
+  partnerBusinessName?: string;
 };
 
 export type PageProductListResponse = {

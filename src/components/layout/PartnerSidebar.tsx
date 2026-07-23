@@ -18,6 +18,7 @@ const partnerNavigation = [
   { name: "Overview", href: "/partner", icon: LayoutDashboard },
   { name: "Assigned Orders", href: "/partner/orders", icon: ShoppingCart },
   { name: "My Engineers", href: "/partner/engineers", icon: Users },
+  { name: "Products & Pricing", href: "/partner/products", icon: Package },
 ];
 
 export function PartnerSidebar() {

@@ -1,5 +1,5 @@
 import { apiFetch } from "@/lib/api/client";
-import type { OrderResponse } from "@/types/dto";
+import type { OrderResponse, ProductDetailResponse, CityPricingDto } from "@/types/dto";
 import type { EngineerProfile, CreateEngineerRequest } from "@/services/engineer.service";
 
 export const partnerDashboardService = {
@@ -34,5 +34,17 @@ export const partnerDashboardService = {
   deleteEngineer: (id: string) =>
     apiFetch<void>(`/api/partner/engineers/${id}`, {
       method: "DELETE",
+    }),
+
+  requestNewProduct: (data: any) =>
+    apiFetch<ProductDetailResponse>("/api/partner/products", {
+      method: "POST",
+      body: data,
+    }),
+
+  updateCityPricing: (productId: string, data: CityPricingDto) =>
+    apiFetch<ProductDetailResponse>(`/api/partner/products/${productId}/city-pricing`, {
+      method: "PUT",
+      body: data,
     }),
 };
