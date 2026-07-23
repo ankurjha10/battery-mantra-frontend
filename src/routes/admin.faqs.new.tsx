@@ -74,7 +74,7 @@ function NewFaq() {
       <form onSubmit={handleSubmit} className="space-y-6 bg-card border rounded-xl p-6 shadow-sm">
         <div className="space-y-2">
           <Label>Page Type <span className="text-destructive">*</span></Label>
-          <Select value={pageType} onValueChange={setPageType} required>
+          <Select value={pageType || undefined} onValueChange={setPageType} required>
             <SelectTrigger>
               <SelectValue placeholder="Select a page type..." />
             </SelectTrigger>
