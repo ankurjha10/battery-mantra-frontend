@@ -35,7 +35,7 @@ import { cartService } from "@/services/cart.service";
 import { toast } from "sonner";
 import { useNavigate } from "@tanstack/react-router";
 import { useLocationStore } from "@/store/useLocationStore";
-import { AlertCircle, Clock } from "lucide-react";
+import { AlertCircle, Clock, MapPin } from "lucide-react";
 import { deliveryTimeService } from "@/services/delivery-time.service";
 
 const searchSchema = z.object({
