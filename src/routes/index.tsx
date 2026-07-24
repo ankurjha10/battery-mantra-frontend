@@ -158,7 +158,9 @@ function HomePage() {
         </Container>
       </div>
 
-      <GlobalFaqSection />
+      <div className="order-6 w-full">
+        <GlobalFaqSection />
+      </div>
 
       <div className="order-5 w-full">
         <CallbackBanner />
