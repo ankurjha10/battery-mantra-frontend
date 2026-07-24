@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useSuspenseQuery, useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { z } from "zod";
-import { CheckCircle2, ShoppingCart, Zap, ShieldCheck, Truck, RefreshCw, Battery, Settings, PiggyBank, Star, Cpu, Wrench } from "lucide-react";
+import { CheckCircle2, ShoppingCart, Zap, ShieldCheck, Truck, RefreshCw, Battery, Settings, PiggyBank, Star, Cpu, Wrench, ShieldAlert, Maximize, Scale, Activity, Layers, Plug, Info } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { ProductGallery } from "@/components/products/ProductGallery";
 import { SpecificationsTable, flattenSpecs } from "@/components/products/SpecificationsTable";
@@ -184,13 +184,19 @@ function PdpPage() {
 
   const getSpecIcon = (key: string) => {
     const k = key.toLowerCase();
-    if (k.includes("warranty") || k.includes("life")) return <ShieldCheck className="h-6 w-6 text-white" />;
-    if (k.includes("capacity") || k.includes("battery")) return <Battery className="h-6 w-6 text-white" />;
-    if (k.includes("type") || k.includes("volt")) return <Zap className="h-6 w-6 text-white" />;
+    if (k.includes("not covered") || k.includes("exclusion")) return <ShieldAlert className="h-6 w-6 text-white" />;
+    if (k.includes("warranty") || k.includes("life") || k.includes("guarantee")) return <ShieldCheck className="h-6 w-6 text-white" />;
+    if (k.includes("capacity") || k.includes("ah") || k.includes("battery")) return <Battery className="h-6 w-6 text-white" />;
+    if (k.includes("type") || k.includes("chemistry")) return <Zap className="h-6 w-6 text-white" />;
     if (k.includes("maintenance")) return <Wrench className="h-6 w-6 text-white" />;
     if (k.includes("cost") || k.includes("price") || k.includes("saving")) return <PiggyBank className="h-6 w-6 text-white" />;
     if (k.includes("bms") || k.includes("compact") || k.includes("size")) return <Cpu className="h-6 w-6 text-white" />;
-    return <Star className="h-6 w-6 text-white" />;
+    if (k.includes("dimension") || k.includes("length") || k.includes("width") || k.includes("height")) return <Maximize className="h-6 w-6 text-white" />;
+    if (k.includes("weight") || k.includes("kg")) return <Scale className="h-6 w-6 text-white" />;
+    if (k.includes("volt")) return <Activity className="h-6 w-6 text-white" />;
+    if (k.includes("layout") || k.includes("terminal") || k.includes("polarity")) return <Plug className="h-6 w-6 text-white" />;
+    if (k.includes("material") || k.includes("alloy") || k.includes("grid")) return <Layers className="h-6 w-6 text-white" />;
+    return <CheckCircle2 className="h-6 w-6 text-white" />;
   };
 
   const originalPrice = data.specs?.originalPrice ? Number(data.specs.originalPrice) : null;
