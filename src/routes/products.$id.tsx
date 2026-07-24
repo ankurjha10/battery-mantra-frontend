@@ -561,10 +561,10 @@ function PdpPage() {
           brand_name: data.brandName || "Brand",
           category_name: data.productCategory || "Battery",
           city_name: "your city",
-          warranty_name: flattenedSpecs.find((s: any) => s.key.toLowerCase().includes("warranty"))?.value || "",
+          warranty_name: allFlatSpecs.find((s: any) => s[0].toLowerCase().includes("warranty"))?.[1] || "",
           price_name: data.productPrice?.toString() || "",
           mrp_name: (data.productPrice * 1.2).toFixed(2),
-          capa_ct_name: flattenedSpecs.find((s: any) => s.key.toLowerCase().includes("capacity"))?.value || "",
+          capa_ct_name: allFlatSpecs.find((s: any) => s[0].toLowerCase().includes("capacity"))?.[1] || "",
         }} 
       />
 
