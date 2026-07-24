@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useSuspenseQuery, useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { z } from "zod";
-import { CheckCircle2, ShoppingCart, Zap, ShieldCheck, Truck, RefreshCw, Battery } from "lucide-react";
+import { CheckCircle2, ShoppingCart, Zap, ShieldCheck, Truck, RefreshCw, Battery, Settings, PiggyBank, Star, Cpu, Wrench } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { ProductGallery } from "@/components/products/ProductGallery";
 import { SpecificationsTable, flattenSpecs } from "@/components/products/SpecificationsTable";
@@ -180,7 +180,18 @@ function PdpPage() {
 
   const topSpecs = [...allFlatSpecs]
     .sort((a, b) => getPriorityScore(a[0]) - getPriorityScore(b[0]))
-    .slice(0, 4);
+    .slice(0, 6);
+
+  const getSpecIcon = (key: string) => {
+    const k = key.toLowerCase();
+    if (k.includes("warranty") || k.includes("life")) return <ShieldCheck className="h-6 w-6 text-white" />;
+    if (k.includes("capacity") || k.includes("battery")) return <Battery className="h-6 w-6 text-white" />;
+    if (k.includes("type") || k.includes("volt")) return <Zap className="h-6 w-6 text-white" />;
+    if (k.includes("maintenance")) return <Wrench className="h-6 w-6 text-white" />;
+    if (k.includes("cost") || k.includes("price") || k.includes("saving")) return <PiggyBank className="h-6 w-6 text-white" />;
+    if (k.includes("bms") || k.includes("compact") || k.includes("size")) return <Cpu className="h-6 w-6 text-white" />;
+    return <Star className="h-6 w-6 text-white" />;
+  };
 
   const originalPrice = data.specs?.originalPrice ? Number(data.specs.originalPrice) : null;
   const hasDiscount = originalPrice && originalPrice > data.productPrice;
@@ -352,16 +363,30 @@ function PdpPage() {
 
             {/* Key Highlights */}
             {topSpecs.length > 0 && (
-              <div className="bg-background rounded-xl p-5 border shadow-sm">
-                <h3 className="font-semibold text-lg mb-4">Key Highlights</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-6">
-                  {topSpecs.map(([key, value]) => (
-                    <div key={key} className="flex items-start gap-2 text-sm">
-                      <div className="h-1.5 w-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
-                      <span className="text-muted-foreground min-w-[100px]">{key}</span>
-                      <span className="font-medium text-foreground">{String(value)}</span>
-                    </div>
-                  ))}
+              <div className="pt-2 pb-4">
+                <h3 className="font-bold text-2xl mb-8 text-foreground">Key Features</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-y-10 gap-x-4">
+                  {topSpecs.map(([key, value], idx) => {
+                    return (
+                      <div key={key} className="flex items-center gap-4 relative">
+                        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#0a2351] shadow-md">
+                           {getSpecIcon(key)}
+                        </div>
+                        <div className="flex flex-col pr-4">
+                           <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-0.5">{key}</span>
+                           <span className="font-bold text-lg text-foreground leading-tight">{String(value)}</span>
+                        </div>
+                        {/* Divider for desktop */}
+                        {(idx + 1) % 3 !== 0 && idx !== topSpecs.length - 1 && (
+                          <div className="hidden xl:block absolute right-0 top-1/2 -translate-y-1/2 h-10 w-px bg-border -mr-2" />
+                        )}
+                        {/* Divider for tablet */}
+                        {(idx + 1) % 2 !== 0 && idx !== topSpecs.length - 1 && (
+                          <div className="hidden sm:block xl:hidden absolute right-0 top-1/2 -translate-y-1/2 h-10 w-px bg-border -mr-2" />
+                        )}
+                      </div>
+                    )
+                  })}
                 </div>
               </div>
             )}
