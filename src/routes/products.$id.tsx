@@ -369,7 +369,7 @@ function PdpPage() {
                   {topSpecs.map(([key, value], idx) => {
                     return (
                       <div key={key} className="flex items-center gap-4 relative">
-                        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#0a2351] shadow-md">
+                        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-brand shadow-md">
                            {getSpecIcon(key)}
                         </div>
                         <div className="flex flex-col pr-4">
